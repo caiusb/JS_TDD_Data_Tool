@@ -141,12 +141,12 @@
     });
     }
 
-    function addPlaceHolders(currRow){
+    function addPlaceHolders(currRow, divClass){
       $.each(fileNames, function( key, val ) {
         if(currRow === key){
           
         }else{
-          $('#'+getSafePath(key)).append("<div class='placeHolder'></div>");
+          $('#'+getSafePath(key)).append("<div class='" + divClass + "'></div>");
         }
       });
     }
@@ -173,6 +173,10 @@
       return true;
     }
 
+    function addEventDiv(divId, divClass, eventType, key){
+      $('#'+divId).append("<div class='" + divClass + "' id='" + eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");
+    }
+
     function addEvent(event,key){
       //ADD LENGTH TO DIV
       //allEvents
@@ -186,20 +190,21 @@
       if (!(typeof event.entityAddress === "undefined")){ 
         if(event.entityAddress.indexOf(".java") > -1){
 
-         if (!isMiddleJavaTextChangeEvent(key, allJSONData)) {
-          $('#'+getSafePath(event.entityAddress)).append("<div class='eventDiv' id='" + event.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>"); 
-            //ADD FILE EVENT 
-          addPlaceHolders(event.entityAddress); 
-         };
+         if (isMiddleJavaTextChangeEvent(key, allJSONData)) {
+          addEventDiv(getSafePath(event.entityAddress), "smallEventDiv", event.eventType, key);
+          addPlaceHolders(event.entityAddress, "smallPlaceHolder");
+         }else{
+          addEventDiv(getSafePath(event.entityAddress), "eventDiv", event.eventType, key);
+          addPlaceHolders(event.entityAddress, "placeHolder"); 
+         }
          
          }else{
-        $('#events').append("<div class='eventDiv' id='" + event.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");
-        addPlaceHolders("events");
+          addEventDiv("events", "eventDiv", event.eventType, key);
+          addPlaceHolders("events", "placeHolder");
         }
       }else{
-          //ADD EVENT
-          $('#events').append("<div class='eventDiv' id='" + event.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");
-          addPlaceHolders("events");
+          addEventDiv("events", "eventDiv", event.eventType, key);
+          addPlaceHolders("events", "placeHolder");
       }
         
         // if (!(typeof event.entityAddress === "undefined")){ 
