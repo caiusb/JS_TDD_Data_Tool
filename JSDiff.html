@@ -173,6 +173,10 @@
       return true;
     }
 
+    function addEventDiv(divId, divClass, eventType, key){
+      $('#'+divId).append("<div class='" + divClass + "' id='" + eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");
+    }
+
     function addEvent(event,key){
       //ADD LENGTH TO DIV
       //allEvents
@@ -187,18 +191,16 @@
         if(event.entityAddress.indexOf(".java") > -1){
 
          if (!isMiddleJavaTextChangeEvent(key, allJSONData)) {
-          $('#'+getSafePath(event.entityAddress)).append("<div class='eventDiv' id='" + event.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>"); 
-            //ADD FILE EVENT 
+          addEventDiv(getSafePath(event.entityAddress), "eventDiv", event.eventType, key);
           addPlaceHolders(event.entityAddress); 
          };
          
          }else{
-        $('#events').append("<div class='eventDiv' id='" + event.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");
-        addPlaceHolders("events");
+          addEventDiv("events", "eventDiv", event.eventType, key);
+          addPlaceHolders("events");
         }
       }else{
-          //ADD EVENT
-          $('#events').append("<div class='eventDiv' id='" + event.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");
+          addEventDiv("events", "eventDiv", event.eventType, key);
           addPlaceHolders("events");
       }
         
