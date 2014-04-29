@@ -151,6 +151,28 @@
       });
     }
 
+    //precondition: key refers to event on java file
+    function isMiddleJavaTextChangeEvent(key, allJSONData){
+
+      var currentEvent = allJSONData[key];
+      var previousEvent = allJSONData[key - 1];
+      var nextEvent = allJSONData[key + 1];
+
+      var isFirstEvent = key === 0;
+      var isLastEvent = key === allJSONData.length - 1;
+
+      if(currentEvent.eventType != "textChange")
+        return false;
+
+      if(isFirstEvent || previousEvent.eventType != "textChange")
+        return false;
+
+      if (isLastEvent || nextEvent.eventType != "textChange")
+        return false;
+
+      return true;
+    }
+
     function addEvent(event,key){
       //ADD LENGTH TO DIV
       //allEvents
@@ -163,9 +185,13 @@
 
       if (!(typeof event.entityAddress === "undefined")){ 
         if(event.entityAddress.indexOf(".java") > -1){
-         $('#'+getSafePath(event.entityAddress)).append("<div class='eventDiv' id='" + event.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>"); 
-         //ADD FILE EVENT 
-            addPlaceHolders(event.entityAddress);
+
+         if (!isMiddleJavaTextChangeEvent(key, allJSONData)) {
+          $('#'+getSafePath(event.entityAddress)).append("<div class='eventDiv' id='" + event.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>"); 
+            //ADD FILE EVENT 
+          addPlaceHolders(event.entityAddress); 
+         };
+         
          }else{
         $('#events').append("<div class='eventDiv' id='" + event.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");
         addPlaceHolders("events");
