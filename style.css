@@ -83,7 +83,7 @@ ins {
 
 #bottomBar{
 	width:100%;
-	height:150px;
+	height:190px;
 	overflow-x: scroll;
 	
 }
@@ -128,7 +128,7 @@ ins {
 }
 
 .smallPlaceHolder{
-	width:2px;
+	width:1px;
 	height:2px;
 	float:left;
 	margin-left:1px;
