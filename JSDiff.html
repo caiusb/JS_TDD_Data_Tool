@@ -190,10 +190,13 @@
       if (!(typeof event.entityAddress === "undefined")){ 
         if(event.entityAddress.indexOf(".java") > -1){
 
-         if (!isMiddleJavaTextChangeEvent(key, allJSONData)) {
+         if (isMiddleJavaTextChangeEvent(key, allJSONData)) {
+          addEventDiv(getSafePath(event.entityAddress), "smallEventDiv", event.eventType, key);
+          addPlaceHolders(event.entityAddress, "smallPlaceHolder");
+         }else{
           addEventDiv(getSafePath(event.entityAddress), "eventDiv", event.eventType, key);
-         };
           addPlaceHolders(event.entityAddress, "placeHolder"); 
+         }
          
          }else{
           addEventDiv("events", "eventDiv", event.eventType, key);
