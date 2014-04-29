@@ -8,119 +8,192 @@
 </head>
 <body>
 
-<div id="settings">
-  <h1>Diff</h1>
-  <label><input type="radio" name="diff_type" value="diffChars" checked> Chars</label>
-  <label><input type="radio" name="diff_type" value="diffWords"> Words</label>
-  <label><input type="radio" name="diff_type" value="diffLines"> Lines</label>
-</div>
-
-<a href="https://github.com/kpdecker/jsdiff" class="source">github.com/kpdecker/jsdiff</a>
-
-<table>
-  <tr>
-    <td contenteditable="true" id="a">restaurant</td>
-    <td contenteditable="true" id="b">aura</td>
-    <td><pre id="result"></pre></td>
-  </tr>
-</table>
-
-<div id="bottomBar" >
-  Source Events
-  <div id="allEvents" >
+  <div id="settings">
+    <h1>Diff</h1>
+    <label><input type="radio" name="diff_type" value="diffChars" checked> Chars</label>
+    <label><input type="radio" name="diff_type" value="diffWords"> Words</label>
+    <label><input type="radio" name="diff_type" value="diffLines"> Lines</label>
   </div>
-</div>
 
-<script src="diff.js"></script>
-<script defer>
-var lastUpdate = 'B';
-var a = document.getElementById('a');
-var b = document.getElementById('b');
-var result = document.getElementById('result');
+  <a href="https://github.com/kpdecker/jsdiff" class="source">github.com/kpdecker/jsdiff</a>
 
-function changed() {
-  var diff = JsDiff[window.diffType](a.textContent, b.textContent);
-  var fragment = document.createDocumentFragment();
-  for (var i=0; i < diff.length; i++) {
+  <table>
+    <tr>
+      <td contenteditable="true" id="a">restaurant</td>
+      <td contenteditable="true" id="b">aura</td>
+      <td><pre id="result"></pre></td>
+    </tr>
+  </table>
 
-    if (diff[i].added && diff[i + 1] && diff[i + 1].removed) {
-      var swap = diff[i];
-      diff[i] = diff[i + 1];
-      diff[i + 1] = swap;
+  <div id="bottomBar" >
+    Source Events
+    <div id="allEvents" >
+    </div>
+  </div>
+
+  <script src="diff.js"></script>
+  <script defer>
+    var lastUpdate = 'B';
+    var a = document.getElementById('a');
+    var b = document.getElementById('b');
+    var result = document.getElementById('result');
+
+    function changed() {
+      var diff = JsDiff[window.diffType](a.textContent, b.textContent);
+      var fragment = document.createDocumentFragment();
+      for (var i=0; i < diff.length; i++) {
+
+        if (diff[i].added && diff[i + 1] && diff[i + 1].removed) {
+          var swap = diff[i];
+          diff[i] = diff[i + 1];
+          diff[i + 1] = swap;
+        }
+
+        var node;
+        if (diff[i].removed) {
+          node = document.createElement('del');
+          node.appendChild(document.createTextNode(diff[i].value));
+        } else if (diff[i].added) {
+          node = document.createElement('ins');
+          node.appendChild(document.createTextNode(diff[i].value));
+        } else {
+          node = document.createTextNode(diff[i].value);
+        }
+        fragment.appendChild(node);
+      }
+
+      result.textContent = '';
+      result.appendChild(fragment);
     }
 
-    var node;
-    if (diff[i].removed) {
-      node = document.createElement('del');
-      node.appendChild(document.createTextNode(diff[i].value));
-    } else if (diff[i].added) {
-      node = document.createElement('ins');
-      node.appendChild(document.createTextNode(diff[i].value));
+    window.onload = function() {
+      onDiffTypeChange(document.querySelector('#settings [name="diff_type"]:checked'));
+      changed();
+    };
+
+    a.onpaste = a.onchange =
+    b.onpaste = b.onchange = changed;
+
+    if ('oninput' in a) {
+      a.oninput = b.oninput = changed;
     } else {
-      node = document.createTextNode(diff[i].value);
+      a.onkeyup = b.onkeyup = changed;
     }
-    fragment.appendChild(node);
-  }
 
-  result.textContent = '';
-  result.appendChild(fragment);
-}
+    function onDiffTypeChange(radio) {
+      window.diffType = radio.value;
+      document.title = "Diff " + radio.value.slice(4);
+    }
 
-window.onload = function() {
-  onDiffTypeChange(document.querySelector('#settings [name="diff_type"]:checked'));
-  changed();
-};
+    var radio = document.getElementsByName('diff_type');
+    for (var i = 0; i < radio.length; i++) {
+      radio[i].onchange = function(e) {
+        onDiffTypeChange(e.target);
+        changed();
+      }
+    }
 
-a.onpaste = a.onchange =
-b.onpaste = b.onchange = changed;
-
-if ('oninput' in a) {
-  a.oninput = b.oninput = changed;
-} else {
-  a.onkeyup = b.onkeyup = changed;
-}
-
-function onDiffTypeChange(radio) {
-  window.diffType = radio.value;
-  document.title = "Diff " + radio.value.slice(4);
-}
-
-var radio = document.getElementsByName('diff_type');
-for (var i = 0; i < radio.length; i++) {
-  radio[i].onchange = function(e) {
-    onDiffTypeChange(e.target);
-    changed();
-  }
-}
-
-function decodeAndSet(Idx){
-if(lastUpdate == 'B'){
-  $("#a").empty().text(allJSONData[Idx].currText);
-  lastUpdate = "A";
-}else{
-  $("#b").empty().text(allJSONData[Idx].currText);
-  lastUpdate = "B";
-}
-changed();
-}
+    function decodeAndSet(Idx){
+      if(lastUpdate == 'B'){
+        $("#a").empty().text(allJSONData[Idx].currText);
+        lastUpdate = "A";
+      }else{
+        $("#b").empty().text(allJSONData[Idx].currText);
+        lastUpdate = "B";
+      }
+      changed();
+    }
 
 
-</script>
-<script>
+  </script>
+  <script>
 
-var allJSONData = [];
+    var allJSONData = [];
 
-$(document).ready(function(){
-  $.getJSON( "intermediateJSON.json", function( data ) {
-     allJSONData = data;
-     var items = [];
-     $.each( allJSONData, function( key, val ) {
-      items.push( "<div class='eventDiv' id='" + val.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>" );
+    var AllFiles = [];
+
+    function checkAndSet(fileName) {
+      if (!(typeof fileName === "undefined")){ 
+        if(fileName.indexOf(".java") > -1){
+          AllFiles[fileName] = 1;
+        }else{
+          AllFiles["other"] = 1;
+        }
+      }
+    }
+
+    function setupFileDivs(AllFiles){
+      console.log(AllFiles);
+    }
+
+    function getSafePath(path){
+      return path.replace(/\//g, '').replace(/\./g, '');
+    }
+
+    function findAllFiles(allJSONData){
+      var fileNames = {};
+      $.each( allJSONData, function( key, val ) {
+       if (!(typeof val.entityAddress === "undefined")){ 
+        if(val.entityAddress.indexOf(".java") > -1){
+          fileNames[val.entityAddress] = 1;
+        }else{
+          fileNames["other"] = 1;
+        }
+      }
+
     });
+      return(fileNames);
+    }
 
-$.each(items, function(){
-        $('#allEvents').append(this);
-    })
+
+    $(document).ready(function(){
+      $.getJSON( "intermediateJSON.json", function( data ) {
+       allJSONData = data;
+       var items = [];
+       var fileNames = findAllFiles(allJSONData);
+       console.log(fileNames);
+       $.each(fileNames, function( key, val ) {
+        $('#allEvents').append("<div id='rowContainer'><div class='rowLabel'>"+key+"</div><div class='fileRow' id='" + getSafePath(key) + "' ></div></div>");   
+      });
+
+       $.each( allJSONData, function( key, val ) {
+
+        if (!(typeof val.entityAddress === "undefined")){ 
+          if(val.entityAddress.indexOf(".java") > -1){
+            row = $('#' + getSafePath(val.entityAddress));
+            $('#'+getSafePath(val.entityAddress)).append("<div class='eventDiv' id='" + val.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");
+          }else{
+            $('#other').append("<div class='eventDiv' id='" + val.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");
+          }
+        }
+      });
+
+
+          //items.push( "<div class='eventDiv' id='" + val.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>" );
+
+
+     });
+    });
+       // checkAndSet();
+    // //FIND NUMBER OF FILES
+    // $.each( allJSONData, function( key, val ) {
+    //   items.push( "<div class='eventDiv' id='" + val.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>" );    
+    // });
+
+
+
+      // setupFileDivs(AllFiles);
+
+      // $.each(allJSONData, function( key, val ) {
+
+      //   checkAndSet(val.entityAddress);
+
+      //   items.push( "<div class='eventDiv' id='" + val.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>" );
+      // });
+
+      // $.each(items, function(){
+      //   $('#allEvents').append(this);
+      // })
     /*$( "<ul/>", {
     "class": "my-new-list",
     html: items.join( "" )
@@ -130,9 +203,9 @@ $.each(items, function(){
 //items.join( "" ).html().appendTo( "#bottomBar" );
 
 
-  });
 
-});
+
+
 </script>
 </body>
 </html>
