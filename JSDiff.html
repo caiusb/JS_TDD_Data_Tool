@@ -110,7 +110,7 @@
 
     var allJSONData = [];
 
-    var AllFiles = [];
+    var fileNames = {};
 
     function checkAndSet(fileName) {
       if (!(typeof fileName === "undefined")){ 
@@ -130,50 +130,111 @@
       return path.replace(/\//g, '').replace(/\./g, '');
     }
 
-    function findAllFiles(allJSONData){
-      var fileNames = {};
-      $.each( allJSONData, function( key, val ) {
-       if (!(typeof val.entityAddress === "undefined")){ 
-        if(val.entityAddress.indexOf(".java") > -1){
-          fileNames[val.entityAddress] = 1;
-        }else{
-          fileNames["other"] = 1;
-        }
-      }
+    function addColumn(event,key){
+      $.each( AllFiles, function( key1, val1 ) {
+        if(event.entityAddress === key1.entityAddress){
+         $('#'+getSafePath(event.entityAddress)).append("<div class='eventDiv' id='" + event.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");  
 
+       }else{
+        $('#'+getSafePath(val.entityAddress)).append("<div class='placeHolder' id='" + val.eventType + "'></div>");
+      }
     });
-      return(fileNames);
     }
 
-
-    $(document).ready(function(){
-      $.getJSON( "intermediateJSON.json", function( data ) {
-       allJSONData = data;
-       var items = [];
-       var fileNames = findAllFiles(allJSONData);
-       console.log(fileNames);
-       $.each(fileNames, function( key, val ) {
-        $('#allEvents').append("<div id='rowContainer'><div class='rowLabel'>"+key+"</div><div class='fileRow' id='" + getSafePath(key) + "' ></div></div>");   
-      });
-
-       $.each( allJSONData, function( key, val ) {
-
-        if (!(typeof val.entityAddress === "undefined")){ 
-          if(val.entityAddress.indexOf(".java") > -1){
-            row = $('#' + getSafePath(val.entityAddress));
-            $('#'+getSafePath(val.entityAddress)).append("<div class='eventDiv' id='" + val.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");
-          }else{
-            $('#other').append("<div class='eventDiv' id='" + val.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");
-          }
+    function addPlaceHolders(currRow){
+      $.each(fileNames, function( key, val ) {
+        if(currRow === key){
+          
+        }else{
+          $('#'+getSafePath(key)).append("<div class='placeHolder'></div>");
         }
       });
+    }
+
+    function addEvent(event,key){
+      //ADD LENGTH TO DIV
+      //allEvents
+      // var currWidth = $("#allEvents").width();
+      // $("#allEvents").width(currWidth + 11);
+
+      $("#allEvents").width( function(index, width) {
+        return width + 11;
+      } )
+
+      if (!(typeof event.entityAddress === "undefined")){ 
+        if(event.entityAddress.indexOf(".java") > -1){
+         $('#'+getSafePath(event.entityAddress)).append("<div class='eventDiv' id='" + event.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>"); 
+         //ADD FILE EVENT 
+            addPlaceHolders(event.entityAddress);
+         }else{
+        $('#events').append("<div class='eventDiv' id='" + event.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");
+        addPlaceHolders("events");
+        }
+      }else{
+          //ADD EVENT
+          $('#events').append("<div class='eventDiv' id='" + event.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");
+          addPlaceHolders("events");
+      }
+        
+        // if (!(typeof event.entityAddress === "undefined")){ 
+        //   if(event.entityAddress.indexOf(".java") > -1){
+        //    $('#'+getSafePath(event.entityAddress)).append("<div class='eventDiv' id='" + event.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");  
+
+        //   }else{
+        //     $('#events').append("<div class='eventDiv' id='" + event.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");
+        //   }
+        // }else{
+        //   //addPlaceHolders();
+        //   $('#events').append("<div class='eventDiv' id='" + event.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");
+        // }
+
+      }
+
+      function findAllFiles(allJSONData){
+        
+        $.each( allJSONData, function( key, val ) {
+         if (!(typeof val.entityAddress === "undefined")){ 
+          if(val.entityAddress.indexOf(".java") > -1){
+            fileNames[val.entityAddress] = 1;
+          }else{
+            fileNames["events"] = 1;
+          }
+        }
+
+      });
+        return(fileNames);
+      }
 
 
+      $(document).ready(function(){
+        $.getJSON( "intermediateJSON.json", function( data ) {
+         allJSONData = data;
+         var items = [];
+         var fileNames = findAllFiles(allJSONData);
+         console.log(fileNames);
+         $.each(fileNames, function( key, val ) {
+          $('#allEvents').append("<div id='rowContainer'><div class='rowLabel'>"+key+"</div><div class='fileRow' id='" + getSafePath(key) + "' ></div></div>");   
+        });
+
+         $.each( allJSONData, function( key, val ) {
+          addEvent(val,key);
+        });
+
+
+
+            // $.each(fileNames, function( key, value ) {
+            //  if(key === val.entityAddress) { 
+            //    ow = $('#' + getSafePath(val.entityAddress));
+            //   $('#'+getSafePath(val.entityAddress)).append("<div class='eventDiv' id='" + val.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");
+            // }else{
+            //   $('#'+getSafePath(val.entityAddress)).append("<div class='placeHolder' id='" + val.eventType + "'></div>");
+            // }
+            // });
           //items.push( "<div class='eventDiv' id='" + val.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>" );
 
 
-     });
-    });
+        });
+});
        // checkAndSet();
     // //FIND NUMBER OF FILES
     // $.each( allJSONData, function( key, val ) {
