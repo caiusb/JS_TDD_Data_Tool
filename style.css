@@ -91,7 +91,7 @@ ins {
 	width:10px;
 	height:20px;
 	float:left;
-	margin-left:1px;
+	margin-left:0px;
 	background-color:darkgray;
 }
 
@@ -99,7 +99,7 @@ ins {
 	width:1px;
 	height:20px;
 	float:left;
-	margin-left:1px;
+	margin-left:0px;
 	background-color:darkgray;
 }
 
@@ -115,23 +115,23 @@ ins {
 }
 
 #allEvents{
-	width: 300000px;
+	width: 6600px;
 	overflow-x: scroll;
 }
 
 .placeHolder{
 	width:10px;
-	height:10px;
+	height:20px;
 	float:left;
-	margin-left:1px;
+	margin-left:0px;
 	background-color:rgb(209, 209, 209);
 }
 
 .smallPlaceHolder{
 	width:1px;
-	height:2px;
+	height:20px;
 	float:left;
-	margin-left:1px;
-	background-color:orange;
+	margin-left:0px;
+	background-color:rgb(209, 209, 209);
 }
 

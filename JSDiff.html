@@ -141,14 +141,27 @@
     });
     }
 
-    function addPlaceHolders(currRow, divClass){
+    function addPlaceHolders(currRow, divClass, idx){
       $.each(fileNames, function( key, val ) {
         if(currRow === key){
-          
+
         }else{
-          $('#'+getSafePath(key)).append("<div class='" + divClass + "'></div>");
+          if(key === 'TDDCycles'){
+        $('#'+getSafePath(key)).append("<div class='" + divClass + "' onClick='addTDDCycle(" +idx+ ")'></div>");
+          }else{
+             $('#'+getSafePath(key)).append("<div class='" + divClass + "'></div>");
+          }
+        //   if(key === 'TDDCycles'){
+        //     $('#'+getSafePath(key)).append("<div class='" + divClass + "'   onClick='addTDDCycle(" +key+ ")></div>");
+        //   }else{
+        //   $('#'+getSafePath(key)).append("<div class='" + divClass + "'></div>");
+        // }
         }
       });
+    }
+
+    function addTDDCycle(idx){
+      console.log(idx);
     }
 
     //precondition: key refers to event on java file
@@ -187,113 +200,63 @@
       //   return width + 11;
       // });
 
-      if (!(typeof event.entityAddress === "undefined")){ 
-        if(event.entityAddress.indexOf(".java") > -1){
+if (!(typeof event.entityAddress === "undefined")){ 
+  if(event.entityAddress.indexOf(".java") > -1){
 
-         if (isMiddleJavaTextChangeEvent(key, allJSONData)) {
-          addEventDiv(getSafePath(event.entityAddress), "smallEventDiv", event.eventType, key);
-          addPlaceHolders(event.entityAddress, "smallPlaceHolder");
-         }else{
-          addEventDiv(getSafePath(event.entityAddress), "eventDiv", event.eventType, key);
-          addPlaceHolders(event.entityAddress, "placeHolder"); 
-         }
-         
-         }else{
-          addEventDiv("events", "eventDiv", event.eventType, key);
-          addPlaceHolders("events", "placeHolder");
-        }
-      }else{
-          addEventDiv("events", "eventDiv", event.eventType, key);
-          addPlaceHolders("events", "placeHolder");
-      }
-        
-        // if (!(typeof event.entityAddress === "undefined")){ 
-        //   if(event.entityAddress.indexOf(".java") > -1){
-        //    $('#'+getSafePath(event.entityAddress)).append("<div class='eventDiv' id='" + event.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");  
+   if (isMiddleJavaTextChangeEvent(key, allJSONData)) {
+    addEventDiv(getSafePath(event.entityAddress), "smallEventDiv", event.eventType, key);
+    addPlaceHolders(event.entityAddress, "smallPlaceHolder",key);
+  }else{
+    addEventDiv(getSafePath(event.entityAddress), "eventDiv", event.eventType, key);
+    addPlaceHolders(event.entityAddress, "placeHolder",key); 
+  }
 
-        //   }else{
-        //     $('#events').append("<div class='eventDiv' id='" + event.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");
-        //   }
-        // }else{
-        //   //addPlaceHolders();
-        //   $('#events').append("<div class='eventDiv' id='" + event.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");
-        // }
-
-      }
-
-      function findAllFiles(allJSONData){
-        
-        $.each( allJSONData, function( key, val ) {
-         if (!(typeof val.entityAddress === "undefined")){ 
-          if(val.entityAddress.indexOf(".java") > -1){
-            fileNames[val.entityAddress] = 1;
-          }else{
-            fileNames["events"] = 1;
-          }
-        }
-
-      });
-        return(fileNames);
-      }
+}else{
+  addEventDiv("events", "eventDiv", event.eventType, key);
+  addPlaceHolders("events", "placeHolder",key);
+}
+}else{
+  addEventDiv("events", "eventDiv", event.eventType, key);
+  addPlaceHolders("events", "placeHolder",key);
+}
 
 
-      $(document).ready(function(){
-        $.getJSON( "intermediateJSON.json", function( data ) {
-         allJSONData = data;
-         var items = [];
-         var fileNames = findAllFiles(allJSONData);
-         console.log(fileNames);
-         $.each(fileNames, function( key, val ) {
-          $('#allEvents').append("<div id='rowContainer'><div class='rowLabel'>"+key+"</div><div class='fileRow' id='" + getSafePath(key) + "' ></div></div>");   
-        });
+}
 
-         $.each( allJSONData, function( key, val ) {
-          addEvent(val,key);
-        });
+function findAllFiles(allJSONData){
 
+  fileNames["TDDCycles"] = 1;
 
+  $.each( allJSONData, function( key, val ) {
+   if (!(typeof val.entityAddress === "undefined")){ 
+    if(val.entityAddress.indexOf(".java") > -1){
+      fileNames[val.entityAddress] = 1;
+    }else{
+      fileNames["events"] = 1;
+    }
+  }
 
-            // $.each(fileNames, function( key, value ) {
-            //  if(key === val.entityAddress) { 
-            //    ow = $('#' + getSafePath(val.entityAddress));
-            //   $('#'+getSafePath(val.entityAddress)).append("<div class='eventDiv' id='" + val.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");
-            // }else{
-            //   $('#'+getSafePath(val.entityAddress)).append("<div class='placeHolder' id='" + val.eventType + "'></div>");
-            // }
-            // });
-          //items.push( "<div class='eventDiv' id='" + val.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>" );
-
-
-        });
 });
-       // checkAndSet();
-    // //FIND NUMBER OF FILES
-    // $.each( allJSONData, function( key, val ) {
-    //   items.push( "<div class='eventDiv' id='" + val.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>" );    
-    // });
+  return(fileNames);
+}
 
 
+$(document).ready(function(){
+  $.getJSON( "intermediateJSON.json", function( data ) {
+   allJSONData = data;
+   var items = [];
+   var fileNames = findAllFiles(allJSONData);
+   console.log(fileNames);
+   $.each(fileNames, function( key, val ) {
+    $('#allEvents').append("<div class='rowContainer' id='"+key+"Row'><div class='rowLabel'>"+key+"</div><div class='fileRow' id='" + getSafePath(key) + "' ></div></div>");   
+  });
 
-      // setupFileDivs(AllFiles);
+   $.each( allJSONData, function( key, val ) {
+    addEvent(val,key);
+  });
 
-      // $.each(allJSONData, function( key, val ) {
-
-      //   checkAndSet(val.entityAddress);
-
-      //   items.push( "<div class='eventDiv' id='" + val.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>" );
-      // });
-
-      // $.each(items, function(){
-      //   $('#allEvents').append(this);
-      // })
-    /*$( "<ul/>", {
-    "class": "my-new-list",
-    html: items.join( "" )
-  }).appendTo( "#bottomBar" );
-*/
-
-//items.join( "" ).html().appendTo( "#bottomBar" );
-
+ });
+});
 
 
 
