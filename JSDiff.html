@@ -7,13 +7,13 @@
   <script src="jquery-2.1.0.js"></script>
 
 
-    <script src="src/jquery.ui.position.js" type="text/javascript"></script>
-    <script src="src/jquery.contextMenu.js" type="text/javascript"></script>
-    <script src="screen.js" type="text/javascript"></script>
-    <script src="prettify/prettify.js" type="text/javascript"></script>
-    
-    <link href="src/jquery.contextMenu.css" rel="stylesheet" type="text/css" />
-    <link href="screen.css" rel="stylesheet" type="text/css" />
+  <script src="src/jquery.ui.position.js" type="text/javascript"></script>
+  <script src="src/jquery.contextMenu.js" type="text/javascript"></script>
+  <script src="screen.js" type="text/javascript"></script>
+  <script src="prettify/prettify.js" type="text/javascript"></script>
+  
+  <link href="src/jquery.contextMenu.css" rel="stylesheet" type="text/css" />
+  <link href="screen.css" rel="stylesheet" type="text/css" />
 
 </head>
 <body>
@@ -174,23 +174,23 @@
       //ADD SPACER SPOTS
      // $('.spacer').append("<div class='" + divClass + "' id=TDD" +idx+ " onClick='addTDDCycle(" +idx+ ")'></div>");
      $('.spacer').append("<div class='SPACER_" + divClass + "' id=Spacer" +idx+ "></div>");
-    }
+   }
 
 
 
 
-    function addTDDCycle(idx){
-      $("#TDD"+idx).css( "background-color", "red" );
+   function addTDDCycle(idx){
+    $("#TDD"+idx).css( "background-color", "red" );
 
-      var position = $("#TDD"+idx).offset(); 
-      $("#Marker1").css(position) 
-    }
+    var position = $("#TDD"+idx).offset(); 
+    $("#Marker1").css(position) 
+  }
 
 
-function startCycle(el){
+  function startCycle(el){
  // TDDCycles.add({'start': el})
-  console.log($(this).attr('id'));
-  $(this).css( "background-color", "aqua");
+ console.log($(this).attr('id'));
+ $(this).css( "background-color", "aqua");
 
 }
 
@@ -204,48 +204,48 @@ function addListeners(){
   // $('#TDDCycles .smallPlaceHolder').mouseup(endCycle(this));
   //  $('#TDDCycles .smallPlaceHolder').mousedown(startCycle(this));
 
-$('#TDDCycles').mousedown(function(event) {
+  $('#TDDCycles').mousedown(function(event) {
    var clickedElement = event.target;
    console.log(clickedElement.id);
    currStart = clickedElement.id.substr(3);
    $('#'+clickedElement.id).css( "background-color", "#990000");
-});
+ });
 
-   $('#TDDCycles').mouseup(function(event) {
+  $('#TDDCycles').mouseup(function(event) {
    var clickedElement = event.target;
    console.log(clickedElement.id);
    currEnd = clickedElement.id.substr(3);
    console.log(currStart + "_" + currEnd);
-  $('#TDD'+currEnd).css( "background-color", "#990000");
+   $('#TDD'+currEnd).css( "background-color", "#990000");
 
-  $.contextMenu({
-        selector: '#TDD'+currEnd, 
-        callback: function(key, options) {
-            var m = "clicked: " + key;
-            console.log(m); 
-        },
-        items: {
-            "delete": {name: "Delete", icon: "delete"}
-        }
-    });
+  // $.contextMenu({
+  //       selector: '#TDD'+currEnd, 
+  //       callback: function(key, options) {
+  //           var m = "clicked: " + key;
+  //           console.log(m); 
+  //       },
+  //       items: {
+  //           "delete": {name: "Delete", icon: "delete"}
+  //       }
+  //   });
 
-   for (var i=currStart;i<=currEnd;i++)
-   {
+  for (var i=currStart;i<=currEnd;i++)
+  {
     $('#TDD'+i).css( "background-color", "#990000");
 
-  $.contextMenu({
-        selector: '#TDD'+i, 
-        callback: function(key, options) {
-            var m = "clicked: " + key;
-            window.console && console.log(m) || alert(m); 
-        },
-        items: {
-            "delete": {name: "Delete", icon: "delete"}
-        }
+    $.contextMenu({
+      selector: '#TDD'+i, 
+      callback: function(key, options) {
+        var m = "clicked: " + key;
+        console.log(m); 
+      },
+      items: {
+        "delete": {name: "Delete", icon: "delete"}
+      }
     });
-   }
+  }
 
-   TDDCycles.push({"CycleType":"red","CycleStart":currStart,"CycleEnd":currEnd});
+  TDDCycles.push({"CycleType":"red","CycleStart":currStart,"CycleEnd":currEnd});
 });
 }
 
