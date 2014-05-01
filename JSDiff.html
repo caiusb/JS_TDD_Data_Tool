@@ -10,8 +10,7 @@
   <script src="src/jquery.ui.position.js" type="text/javascript"></script>
   <script src="src/jquery.contextMenu.js" type="text/javascript"></script>
   <script src="screen.js" type="text/javascript"></script>
-  <script src="prettify/prettify.js" type="text/javascript"></script>
-  
+
   <link href="src/jquery.contextMenu.css" rel="stylesheet" type="text/css" />
   <link href="screen.css" rel="stylesheet" type="text/css" />
 
@@ -171,8 +170,6 @@
          }
        }
      });
-      //ADD SPACER SPOTS
-     // $('.spacer').append("<div class='" + divClass + "' id=TDD" +idx+ " onClick='addTDDCycle(" +idx+ ")'></div>");
      $('.spacer').append("<div class='SPACER_" + divClass + "' id=Spacer" +idx+ "></div>");
    }
 
@@ -188,7 +185,6 @@
 
 
   function startCycle(el){
- // TDDCycles.add({'start': el})
  console.log($(this).attr('id'));
  $(this).css( "background-color", "aqua");
 
@@ -199,16 +195,10 @@ function endCycle(el){
 }
 
 function addListeners(){
-  // $('#TDDCycles .placeHolder').mouseup(endCycle(this));
-  //  $('#TDDCycles .placeHolder').mousedown(startCycle(this));
-  // $('#TDDCycles .smallPlaceHolder').mouseup(endCycle(this));
-  //  $('#TDDCycles .smallPlaceHolder').mousedown(startCycle(this));
-
   $('#TDDCycles').mousedown(function(event) {
    var clickedElement = event.target;
    console.log(clickedElement.id);
    currStart = clickedElement.id.substr(3);
-   $('#'+clickedElement.id).css( "background-color", "#990000");
  });
 
   $('#TDDCycles').mouseup(function(event) {
@@ -216,128 +206,135 @@ function addListeners(){
    console.log(clickedElement.id);
    currEnd = clickedElement.id.substr(3);
    console.log(currStart + "_" + currEnd);
-   $('#TDD'+currEnd).css( "background-color", "#990000");
-
-  // $.contextMenu({
-  //       selector: '#TDD'+currEnd, 
-  //       callback: function(key, options) {
-  //           var m = "clicked: " + key;
-  //           console.log(m); 
-  //       },
-  //       items: {
-  //           "delete": {name: "Delete", icon: "delete"}
-  //       }
-  //   });
-
-  for (var i=currStart;i<=currEnd;i++)
-  {
-    $('#TDD'+i).css( "background-color", "#990000");
-
-    $.contextMenu({
-      selector: '#TDD'+i, 
-      callback: function(key, options) {
-        var m = "clicked: " + key;
-        console.log(m); 
-      },
-      items: {
-        "delete": {name: "Delete", icon: "delete"}
-      }
-    });
-  }
 
   TDDCycles.push({"CycleType":"red","CycleStart":currStart,"CycleEnd":currEnd});
+  addColorandListeners();
 });
 }
 
-
-
-
-
-    //precondition: key refers to event on java file
-    function isMiddleJavaTextChangeEvent(key, allJSONData){
-
-      var currentEvent = allJSONData[key];
-      var previousEvent = allJSONData[key - 1];
-      var nextEvent = allJSONData[key + 1];
-
-      var isFirstEvent = key === 0;
-      var isLastEvent = key === allJSONData.length - 1;
-
-      if(currentEvent.eventType != "textChange")
-        return false;
-
-      if(isFirstEvent || previousEvent.eventType != "textChange")
-        return false;
-
-      if (isLastEvent || nextEvent.eventType != "textChange")
-        return false;
-
-      return true;
-    }
-
-    function addEventDiv(divId, divClass, eventType, key){
-      $('#'+divId).append("<div class='" + divClass + "' id='" + eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");
-    }
-
-    function addEvent(event,key){
-      if (!(typeof event.entityAddress === "undefined")){ 
-        if(event.entityAddress.indexOf(".java") > -1){
-
-         if (isMiddleJavaTextChangeEvent(key, allJSONData)) {
-          addEventDiv(getSafePath(event.entityAddress), "smallEventDiv", event.eventType, key);
-          addPlaceHolders(event.entityAddress, "smallPlaceHolder",key);
-        }else{
-          addEventDiv(getSafePath(event.entityAddress), "eventDiv", event.eventType, key);
-          addPlaceHolders(event.entityAddress, "placeHolder",key); 
-        }
-
-      }else{
-        addEventDiv("events", "eventDiv", event.eventType, key);
-        addPlaceHolders("events", "placeHolder",key);
+function addColorandListeners(){
+  TDDCycles.forEach(function(entry) {
+      for (var i=entry.CycleStart;i<=entry.CycleEnd;i++)
+      {
+        //$('#TDD'+i).css( "background-color", "#990000");
+        $('#TDD'+i).addClass("REDCYCLE");
+        $.contextMenu({
+          selector: '#TDD'+i, 
+          callback: function(key, options) {
+            removeCycle(this[0].getAttribute('id').substr(3))
+          },
+          items: {
+            "delete": {name: "Delete", icon: "delete"}
+          }
+        });
       }
+  });
+}
+
+function removeCycle(selectedID){
+  console.log("REMOVE "+selectedID);
+  var newLoop = [];
+  TDDCycles.forEach(function(entry) {
+    //console.log(entry.CycleStart);
+    if(entry.CycleStart <= selectedID && selectedID <= entry.CycleEnd){
+      for (var i=entry.CycleStart;i<=entry.CycleEnd;i++)
+      {
+        $('#TDD'+i).removeClass("REDCYCLE");
+        $.contextMenu('destroy' ,'#TDD'+i);
+      }
+    }else{
+      newLoop.push(entry);
+    }
+  });
+  TDDCycles = newLoop;
+}
+
+
+  //precondition: key refers to event on java file
+  function isMiddleJavaTextChangeEvent(key, allJSONData){
+
+  var currentEvent = allJSONData[key];
+  var previousEvent = allJSONData[key - 1];
+  var nextEvent = allJSONData[key + 1];
+
+  var isFirstEvent = key === 0;
+  var isLastEvent = key === allJSONData.length - 1;
+
+  if(currentEvent.eventType != "textChange")
+    return false;
+
+  if(isFirstEvent || previousEvent.eventType != "textChange")
+    return false;
+
+  if (isLastEvent || nextEvent.eventType != "textChange")
+    return false;
+
+  return true;
+  }
+
+  function addEventDiv(divId, divClass, eventType, key){
+    $('#'+divId).append("<div class='" + divClass + "' id='" + eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");
+  }
+
+  function addEvent(event,key){
+    if (!(typeof event.entityAddress === "undefined")){ 
+      if(event.entityAddress.indexOf(".java") > -1){
+
+       if (isMiddleJavaTextChangeEvent(key, allJSONData)) {
+        addEventDiv(getSafePath(event.entityAddress), "smallEventDiv", event.eventType, key);
+        addPlaceHolders(event.entityAddress, "smallPlaceHolder",key);
+      }else{
+        addEventDiv(getSafePath(event.entityAddress), "eventDiv", event.eventType, key);
+        addPlaceHolders(event.entityAddress, "placeHolder",key); 
+      }
+
     }else{
       addEventDiv("events", "eventDiv", event.eventType, key);
       addPlaceHolders("events", "placeHolder",key);
     }
-
-
+  }else{
+    addEventDiv("events", "eventDiv", event.eventType, key);
+    addPlaceHolders("events", "placeHolder",key);
   }
 
-  function findAllFiles(allJSONData){
 
-    fileNames["TDDCycles"] = 1;
+}
 
-    $.each( allJSONData, function( key, val ) {
-     if (!(typeof val.entityAddress === "undefined")){ 
-      if(val.entityAddress.indexOf(".java") > -1){
-        fileNames[val.entityAddress] = 1;
-      }else{
-        fileNames["events"] = 1;
-      }
+function findAllFiles(allJSONData){
+
+  fileNames["TDDCycles"] = 1;
+
+  $.each( allJSONData, function( key, val ) {
+   if (!(typeof val.entityAddress === "undefined")){ 
+    if(val.entityAddress.indexOf(".java") > -1){
+      fileNames[val.entityAddress] = 1;
+    }else{
+      fileNames["events"] = 1;
     }
-
-  });
-    return(fileNames);
   }
 
+});
+  return(fileNames);
+}
 
-  $(document).ready(function(){
-    $.getJSON( "intermediateJSON.json", function( data ) {
-     allJSONData = data;
-     var items = [];
-     var fileNames = findAllFiles(allJSONData);
-     console.log(fileNames);
-     $.each(fileNames, function( key, val ) {
-      $('#allEvents').append("<div class='rowContainer' id='"+key+"Row'><div class='spacer'><div class='rowLabel'>"+key+"</div></div><div class='fileRow' id='" + getSafePath(key) + "' ></div></div>");   
-    });
 
-     $.each( allJSONData, function( key, val ) {
-      addEvent(val,key);
-    });
-     addListeners();
-
-   });
+$(document).ready(function(){
+  $.getJSON( "intermediateJSON.json", function( data ) {
+   allJSONData = data;
+   var items = [];
+   var fileNames = findAllFiles(allJSONData);
+   console.log(fileNames);
+   $.each(fileNames, function( key, val ) {
+    $('#allEvents').append("<div class='rowContainer' id='"+key+"Row'><div class='spacer'><div class='rowLabel'>"+key+"</div></div><div class='fileRow' id='" + getSafePath(key) + "' ></div></div>");   
   });
+
+   $.each( allJSONData, function( key, val ) {
+    addEvent(val,key);
+  });
+   addListeners();
+
+ });
+});
 
 
 

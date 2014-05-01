@@ -147,29 +147,29 @@ ins {
 }
 
 #eventsRow .spacer{
-	background-color: green;
+    //background-color: green;
 }
 
 .spacer{
-	background-color: yellow;
+	//background-color: yellow;
 }
 
 .SPACER_placeHolder{
-	background-color:pink;
+	//background-color:pink;
 	width:8px;
 	height:15px;
 	float:left;
 }
 
 .SPACER_smallPlaceHolder{
-	background-color:pink;
+	//background-color:pink;
 	width:2px;
 	height:15px;
 	float:left;
 }
 
 #TDDCyclesRow .placeHolder{
-	background-color:orange;
+	//background-color:orange;
 	border-left: 1px solid;
 	border-top: 1px solid;
 	border-bottom: 1px solid;
@@ -177,10 +177,14 @@ ins {
 }
 
 #TDDCyclesRow .smallPlaceHolder{
-background-color: orange;
+//background-color: orange;
 border-left: 1px solid;
 border-top: 1px solid;
 border-bottom: 1px solid;
 border-right: 0px;
 width: 1px;
+}
+
+.REDCYCLE{
+	background-color: #990000;
 }
