@@ -194,6 +194,10 @@ function endCycle(el){
   $(this).css( "background-color", "yellow");
 }
 
+function isNumber(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 function addListeners(){
   $('#TDDCycles').mousedown(function(event) {
    var clickedElement = event.target;
@@ -207,23 +211,85 @@ function addListeners(){
    currEnd = clickedElement.id.substr(3);
    console.log(currStart + "_" + currEnd);
 
-  TDDCycles.push({"CycleType":"red","CycleStart":currStart,"CycleEnd":currEnd});
-  addColorandListeners();
+  TDDCycles.push({"id":currStart+currEnd,"CycleType":"red","CycleStart":currStart,"CycleEnd":currEnd});
+  //addColorandListeners();
+        for (var i=Number(currStart);i<=Number(currEnd);i++)
+      {
+        //$('#TDD'+i).css( "background-color", "#990000");
+        $('#TDD'+i).addClass(currStart+currEnd+ " REDCYCLE");
+        $('#TDD'+i).unbind();
+        $.contextMenu({
+          selector: '#TDD'+i, 
+          callback: function(key, options) {
+
+            var arrOfClasses = this[0].className.split(" ");
+            var CycleID ;
+            arrOfClasses.forEach(function(entry) {
+              if(isNumber(entry)){
+                CycleID = entry;
+              }
+            });
+
+            if(key === "writingTests"){
+
+              $("."+CycleID).removeClass("GREENCYCLE");
+              $("."+CycleID).removeClass("BLUECYCLE");
+              $("."+CycleID).addClass("REDCYCLE");
+            }
+            if(key === "writingCode"){
+              $("."+CycleID).removeClass("REDCYCLE");
+              $("."+CycleID).removeClass("BLUECYCLE");
+              $("."+CycleID).addClass("GREENCYCLE");
+            }
+            if(key === "refactoring"){
+              $("."+CycleID).removeClass("GREENCYCLE");
+              $("."+CycleID).removeClass("REDCYCLE");
+              $("."+CycleID).addClass("BLUECYCLE");
+            }
+            if(key === "delete"){
+              removeCycle(this[0].getAttribute('id').substr(3))
+            }
+            
+          },
+          items: {
+            "writingTests": {name: "Tests", icon: "tests"},
+            "writingCode": {name: "Code", icon: "code"},
+            "refactoring": {name: "Refactor", icon: "refactor"},
+            "delete": {name: "Delete", icon: "delete"}
+          }
+        });
+      }
 });
 }
 
 function addColorandListeners(){
   TDDCycles.forEach(function(entry) {
-      for (var i=entry.CycleStart;i<=entry.CycleEnd;i++)
+      for (var i=Number(entry.CycleStart);i<=Number(entry.CycleEnd);i++)
       {
         //$('#TDD'+i).css( "background-color", "#990000");
-        $('#TDD'+i).addClass("REDCYCLE");
+        $('#TDD'+i).addClass("REDCYCLE "+entry.CycleStart+entry.CycleEnd);
+
         $.contextMenu({
           selector: '#TDD'+i, 
           callback: function(key, options) {
-            removeCycle(this[0].getAttribute('id').substr(3))
+            if(key === "writingTests"){
+
+            }
+            if(key === "writingCode"){
+
+            }
+            if(key === "refactoring"){
+
+            }
+            if(key === "delete"){
+              removeCycle(this[0].getAttribute('id').substr(3))
+            }
+            
           },
           items: {
+            "writingTests": {name: "Tests", icon: "tests"},
+            "writingCode": {name: "Code", icon: "code"},
+            "refactoring": {name: "Refactor", icon: "refactor"},
             "delete": {name: "Delete", icon: "delete"}
           }
         });
@@ -236,8 +302,10 @@ function removeCycle(selectedID){
   var newLoop = [];
   TDDCycles.forEach(function(entry) {
     //console.log(entry.CycleStart);
-    if(entry.CycleStart <= selectedID && selectedID <= entry.CycleEnd){
-      for (var i=entry.CycleStart;i<=entry.CycleEnd;i++)
+    var numCycleStart = Number(entry.CycleStart);
+    var numCycleEnd = Number(entry.CycleEnd);
+    if(numCycleStart <= selectedID && selectedID <= numCycleEnd){
+      for (var i=numCycleStart;i<=numCycleEnd;i++)
       {
         $('#TDD'+i).removeClass("REDCYCLE");
         $.contextMenu('destroy' ,'#TDD'+i);
