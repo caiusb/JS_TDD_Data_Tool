@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Diff</title>
+
   <link rel="stylesheet" href="style.css"/>
   <script src="jquery-2.1.0.js"></script>
 
@@ -17,204 +17,276 @@
 </head>
 <body>
 
-  <div id="settings">
-    <h1>Diff</h1>
-    <label><input type="radio" name="diff_type" value="diffChars" checked> Chars</label>
-    <label><input type="radio" name="diff_type" value="diffWords"> Words</label>
-    <label><input type="radio" name="diff_type" value="diffLines"> Lines</label>
-  </div>
+  <div id="topbar">
+    <div id="TDDGraph">
+      <div class="tddCycle"> 
+        <div class="red" id="r1"></div>
+        <div class="green" id="g1"></div>
+        <div class="blue" id="b1"></div>
 
-  <a href="https://github.com/kpdecker/jsdiff" class="source">github.com/kpdecker/jsdiff</a>
+      </div>
+      <div class="tddCycle"> 
+        <div class="red" id="r2"></div>
+        <div class="green" id="g2"></div>
+        <div class="blue" id="b2"></div>
+      </div>
+      <div class="tddCycle"> 
+        <div class="red" id="r3"></div>
+        <div class="green" id="g3"></div>
+        <div class="blue" id="b3"></div>
+      </div>
+      <div class="tddCycle">          
+        <div class="red" id="r4"></div>
+        <div class="green" id="g4"></div>
+        <div class="blue" id="b4"></div> </div>
+        <div class="tddCycle">          
+          <div class="red" id="r5"></div>
+          <div class="green" id="g5"></div>
+          <div class="blue" id="b5"></div> </div>
+          <div class="tddCycle">           
+            <div class="red" id="r6"></div>
+            <div class="green" id="g6"></div>
+            <div class="blue" id="b6"></div></div>
+            <div class="tddCycle">          
+              <div class="red" id="r7"></div>
+              <div class="green" id="g7"></div>
+              <div class="blue" id="b7"></div> </div>
+              <div class="tddCycle">          
+               <div class="red" id="r8"></div>
+               <div class="green" id="g8"></div>
+               <div class="blue" id="b8"></div></div>
+               <div class="tddCycle"> </div>
+               <div class="tddCycle"> </div>
+               <div class="tddCycle"> </div>
+               <div class="tddCycle"> </div>
+               <div class="tddCycle"> </div>
+               <div class="tddCycle"> </div>
 
-  <table>
-    <tr>
-      <td contenteditable="true" id="a">restaurant</td>
-      <td contenteditable="true" id="b">aura</td>
-      <td><pre id="result"></pre></td>
-    </tr>
-  </table>
+             </div>
+             <div id="TDDRadarCharts">
+              <div class="tddCycle">
+                <img src="img/c9.png">
+              </div>
+              <div class="tddCycle">
+                <img src="img/c1.png"> </div>
+                <div class="tddCycle">
+                  <img src="img/c10.png"> </div>
+                  <div class="tddCycle">
+                    <img src="img/c11.png"> </div>
+                    <div class="tddCycle">
+                      <img src="img/c9.png"> </div>
+                      <div class="tddCycle">
+                        <img src="img/c5.png"> </div>
+                        <div class="tddCycle">
+                          <img src="img/c1.png"> </div>
+                          <div class="tddCycle">
+                            <img src="img/c2.png"> </div>
+                            <div class="tddCycle">
+                              <img src="img/c3.png"> </div>        <div class="tddCycle"><img src="img/c1.png"> </div>
+                              <div class="tddCycle">
+                                <img src="img/c4.png"> </div>
+                                <div class="tddCycle">
+                                  <img src="img/c1.png"> </div>
+                                  <div class="tddCycle"> </div>
+                                </div>
+                              </div>
 
-  <div id="bottomBar" >
-    Source Events
-    <div id="allEvents" >
-    </div>
-  </div>
-  <div id="Marker1"></div>
+                              <div id="settings">
+                                <label><input type="radio" name="diff_type" value="diffChars" checked> Chars</label>
+                                <label><input type="radio" name="diff_type" value="diffWords"> Words</label>
+                                <label><input type="radio" name="diff_type" value="diffLines"> Lines</label>
+                              </div>
 
+                            
+                              <table>
+                                <tr>
+                                  <td contenteditable="true" id="a">restaurant</td>
+                                  <td contenteditable="true" id="b">aura</td>
+                                  <td><pre id="result"></pre></td>
+                                </tr>
+                              </table>
 
-
-  <script src="diff.js"></script>
-  <script defer>
-    var lastUpdate = 'B';
-    var a = document.getElementById('a');
-    var b = document.getElementById('b');
-    var result = document.getElementById('result');
-
-    function changed() {
-      var diff = JsDiff[window.diffType](a.textContent, b.textContent);
-      var fragment = document.createDocumentFragment();
-      for (var i=0; i < diff.length; i++) {
-
-        if (diff[i].added && diff[i + 1] && diff[i + 1].removed) {
-          var swap = diff[i];
-          diff[i] = diff[i + 1];
-          diff[i + 1] = swap;
-        }
-
-        var node;
-        if (diff[i].removed) {
-          node = document.createElement('del');
-          node.appendChild(document.createTextNode(diff[i].value));
-        } else if (diff[i].added) {
-          node = document.createElement('ins');
-          node.appendChild(document.createTextNode(diff[i].value));
-        } else {
-          node = document.createTextNode(diff[i].value);
-        }
-        fragment.appendChild(node);
-      }
-
-      result.textContent = '';
-      result.appendChild(fragment);
-    }
-
-    window.onload = function() {
-      onDiffTypeChange(document.querySelector('#settings [name="diff_type"]:checked'));
-      changed();
-    };
-
-    a.onpaste = a.onchange =
-    b.onpaste = b.onchange = changed;
-
-    if ('oninput' in a) {
-      a.oninput = b.oninput = changed;
-    } else {
-      a.onkeyup = b.onkeyup = changed;
-    }
-
-    function onDiffTypeChange(radio) {
-      window.diffType = radio.value;
-      document.title = "Diff " + radio.value.slice(4);
-    }
-
-    var radio = document.getElementsByName('diff_type');
-    for (var i = 0; i < radio.length; i++) {
-      radio[i].onchange = function(e) {
-        onDiffTypeChange(e.target);
-        changed();
-      }
-    }
-
-    function decodeAndSet(Idx){
-      if(lastUpdate == 'B'){
-        $("#a").empty().text(allJSONData[Idx].currText);
-        lastUpdate = "A";
-      }else{
-        $("#b").empty().text(allJSONData[Idx].currText);
-        lastUpdate = "B";
-      }
-      changed();
-    }
-
-
-  </script>
-  <script>
-
-    var allJSONData = [];
-
-    var fileNames = {};
-
-    var TDDCycles = [];
-
-    var currStart;
-    var currEnd;
-
-    function checkAndSet(fileName) {
-      if (!(typeof fileName === "undefined")){ 
-        if(fileName.indexOf(".java") > -1){
-          AllFiles[fileName] = 1;
-        }else{
-          AllFiles["other"] = 1;
-        }
-      }
-    }
-
-    function setupFileDivs(AllFiles){
-      console.log(AllFiles);
-    }
-
-    function getSafePath(path){
-      return path.replace(/\//g, '').replace(/\./g, '');
-    }
-
-    function addColumn(event,key){
-      $.each( AllFiles, function( key1, val1 ) {
-        if(event.entityAddress === key1.entityAddress){
-         $('#'+getSafePath(event.entityAddress)).append("<div class='eventDiv' id='" + event.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");  
-
-       }else{
-        $('#'+getSafePath(val.entityAddress)).append("<div class='placeHolder' id='" + val.eventType + "'></div>");
-      }
-    });
-    }
-
-    function addPlaceHolders(currRow, divClass, idx){
-      $.each(fileNames, function( key, val ) {
-        if(currRow === key){
-
-        }else{
-          if(key === 'TDDCycles'){
-            $('#'+getSafePath(key)).append("<div class='" + divClass + "' id=TDD" +idx+ " '></div>");
-          }else{
-           $('#'+getSafePath(key)).append("<div class='" + divClass + "'></div>");
-         }
-       }
-     });
-     $('.spacer').append("<div class='SPACER_" + divClass + "' id=Spacer" +idx+ "></div>");
-   }
+                              <div id="bottomBar" >
+                                Source Events
+                                <div id="allEvents" >
+                                </div>
+                              </div>
+                              <div id="Marker1"></div>
 
 
 
+                              <script src="diff.js"></script>
+                              <script defer>
+                              var lastUpdate = 'B';
+                              var a = document.getElementById('a');
+                              var b = document.getElementById('b');
+                              var result = document.getElementById('result');
 
-   function addTDDCycle(idx){
-    $("#TDD"+idx).css( "background-color", "red" );
+                              function changed() {
+                                var diff = JsDiff[window.diffType](a.textContent, b.textContent);
+                                var fragment = document.createDocumentFragment();
+                                for (var i=0; i < diff.length; i++) {
 
-    var position = $("#TDD"+idx).offset(); 
-    $("#Marker1").css(position) 
-  }
+                                  if (diff[i].added && diff[i + 1] && diff[i + 1].removed) {
+                                    var swap = diff[i];
+                                    diff[i] = diff[i + 1];
+                                    diff[i + 1] = swap;
+                                  }
+
+                                  var node;
+                                  if (diff[i].removed) {
+                                    node = document.createElement('del');
+                                    node.appendChild(document.createTextNode(diff[i].value));
+                                  } else if (diff[i].added) {
+                                    node = document.createElement('ins');
+                                    node.appendChild(document.createTextNode(diff[i].value));
+                                  } else {
+                                    node = document.createTextNode(diff[i].value);
+                                  }
+                                  fragment.appendChild(node);
+                                }
+
+                                result.textContent = '';
+                                result.appendChild(fragment);
+                              }
+
+                              window.onload = function() {
+                                onDiffTypeChange(document.querySelector('#settings [name="diff_type"]:checked'));
+                                changed();
+                              };
+
+                              a.onpaste = a.onchange =
+                              b.onpaste = b.onchange = changed;
+
+                              if ('oninput' in a) {
+                                a.oninput = b.oninput = changed;
+                              } else {
+                                a.onkeyup = b.onkeyup = changed;
+                              }
+
+                              function onDiffTypeChange(radio) {
+                                window.diffType = radio.value;
+                                document.title = "Diff " + radio.value.slice(4);
+                              }
+
+                              var radio = document.getElementsByName('diff_type');
+                              for (var i = 0; i < radio.length; i++) {
+                                radio[i].onchange = function(e) {
+                                  onDiffTypeChange(e.target);
+                                  changed();
+                                }
+                              }
+
+                              function decodeAndSet(Idx){
+                                if(lastUpdate == 'B'){
+                                  $("#a").empty().text(allJSONData[Idx].currText);
+                                  lastUpdate = "A";
+                                }else{
+                                  $("#b").empty().text(allJSONData[Idx].currText);
+                                  lastUpdate = "B";
+                                }
+                                changed();
+                              }
 
 
-  function startCycle(el){
- console.log($(this).attr('id'));
- $(this).css( "background-color", "aqua");
+                              </script>
+                              <script>
 
-}
+                              var allJSONData = [];
 
-function endCycle(el){
-  $(this).css( "background-color", "yellow");
-}
+                              var fileNames = {};
 
-function isNumber(n) {
-  return !isNaN(parseFloat(n)) && isFinite(n);
-}
+                              var TDDCycles = [];
 
-function addListeners(){
-  $('#TDDCycles').mousedown(function(event) {
-   var clickedElement = event.target;
-   console.log(clickedElement.id);
-   currStart = clickedElement.id.substr(3);
- });
+                              var currStart;
+                              var currEnd;
 
-  $('#TDDCycles').mouseup(function(event) {
-   var clickedElement = event.target;
-   console.log(clickedElement.id);
-   currEnd = clickedElement.id.substr(3);
-   console.log(currStart + "_" + currEnd);
+                              function checkAndSet(fileName) {
+                                if (!(typeof fileName === "undefined")){ 
+                                  if(fileName.indexOf(".java") > -1){
+                                    AllFiles[fileName] = 1;
+                                  }else{
+                                    AllFiles["other"] = 1;
+                                  }
+                                }
+                              }
 
-  TDDCycles.push({"id":currStart+currEnd,"CycleType":"red","CycleStart":currStart,"CycleEnd":currEnd});
+                              function setupFileDivs(AllFiles){
+                                console.log(AllFiles);
+                              }
+
+                              function getSafePath(path){
+                                return path.replace(/\//g, '').replace(/\./g, '');
+                              }
+
+                              function addColumn(event,key){
+                                $.each( AllFiles, function( key1, val1 ) {
+                                  if(event.entityAddress === key1.entityAddress){
+                                   $('#'+getSafePath(event.entityAddress)).append("<div class='eventDiv' id='" + event.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");  
+
+                                 }else{
+                                  $('#'+getSafePath(val.entityAddress)).append("<div class='placeHolder' id='" + val.eventType + "'></div>");
+                                }
+                              });
+                              }
+
+                              function addPlaceHolders(currRow, divClass, idx){
+                                $.each(fileNames, function( key, val ) {
+                                  if(currRow === key){
+
+                                  }else{
+                                    if(key === 'TDDCycles'){
+                                      $('#'+getSafePath(key)).append("<div class='" + divClass + "' id=TDD" +idx+ " '></div>");
+                                    }else{
+                                     $('#'+getSafePath(key)).append("<div class='" + divClass + "'></div>");
+                                   }
+                                 }
+                               });
+                                $('.spacer').append("<div class='SPACER_" + divClass + "' id=Spacer" +idx+ "></div>");
+                              }
+
+
+
+
+                              function addTDDCycle(idx){
+                                $("#TDD"+idx).css( "background-color", "red" );
+
+                                var position = $("#TDD"+idx).offset(); 
+                                $("#Marker1").css(position) 
+                              }
+
+
+                              function startCycle(el){
+                               console.log($(this).attr('id'));
+                               $(this).css( "background-color", "aqua");
+
+                             }
+
+                             function endCycle(el){
+                              $(this).css( "background-color", "yellow");
+                            }
+
+                            function isNumber(n) {
+                              return !isNaN(parseFloat(n)) && isFinite(n);
+                            }
+
+                            function addListeners(){
+                              $('#TDDCycles').mousedown(function(event) {
+                               var clickedElement = event.target;
+                               console.log(clickedElement.id);
+                               currStart = clickedElement.id.substr(3);
+                             });
+
+                              $('#TDDCycles').mouseup(function(event) {
+                               var clickedElement = event.target;
+                               console.log(clickedElement.id);
+                               currEnd = clickedElement.id.substr(3);
+                               console.log(currStart + "_" + currEnd);
+
+                               TDDCycles.push({"id":currStart+currEnd,"CycleType":"red","CycleStart":currStart,"CycleEnd":currEnd});
   //addColorandListeners();
-        for (var i=Number(currStart);i<=Number(currEnd);i++)
-      {
+  for (var i=Number(currStart);i<=Number(currEnd);i++)
+  {
         //$('#TDD'+i).css( "background-color", "#990000");
         $('#TDD'+i).addClass(currStart+currEnd+ " REDCYCLE");
         $('#TDD'+i).unbind();
@@ -258,14 +330,14 @@ function addListeners(){
             "delete": {name: "Delete", icon: "delete"}
           }
         });
-      }
+}
 });
 }
 
 function addColorandListeners(){
   TDDCycles.forEach(function(entry) {
-      for (var i=Number(entry.CycleStart);i<=Number(entry.CycleEnd);i++)
-      {
+    for (var i=Number(entry.CycleStart);i<=Number(entry.CycleEnd);i++)
+    {
         //$('#TDD'+i).css( "background-color", "#990000");
         $('#TDD'+i).addClass("REDCYCLE "+entry.CycleStart+entry.CycleEnd);
 
@@ -294,7 +366,7 @@ function addColorandListeners(){
           }
         });
       }
-  });
+    });
 }
 
 function removeCycle(selectedID){
@@ -321,23 +393,23 @@ function removeCycle(selectedID){
   //precondition: key refers to event on java file
   function isMiddleJavaTextChangeEvent(key, allJSONData){
 
-  var currentEvent = allJSONData[key];
-  var previousEvent = allJSONData[key - 1];
-  var nextEvent = allJSONData[key + 1];
+    var currentEvent = allJSONData[key];
+    var previousEvent = allJSONData[key - 1];
+    var nextEvent = allJSONData[key + 1];
 
-  var isFirstEvent = key === 0;
-  var isLastEvent = key === allJSONData.length - 1;
+    var isFirstEvent = key === 0;
+    var isLastEvent = key === allJSONData.length - 1;
 
-  if(currentEvent.eventType != "textChange")
-    return false;
+    if(currentEvent.eventType != "textChange")
+      return false;
 
-  if(isFirstEvent || previousEvent.eventType != "textChange")
-    return false;
+    if(isFirstEvent || previousEvent.eventType != "textChange")
+      return false;
 
-  if (isLastEvent || nextEvent.eventType != "textChange")
-    return false;
+    if (isLastEvent || nextEvent.eventType != "textChange")
+      return false;
 
-  return true;
+    return true;
   }
 
   function addEventDiv(divId, divClass, eventType, key){
