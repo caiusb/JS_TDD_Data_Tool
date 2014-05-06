@@ -195,3 +195,11 @@ width: 1px;
 .BLUECYCLE{
 	background-color: #111199;
 }
+
+#testRun_Error{
+	background-color: #990000;
+}
+
+#testRun_OK{
+	background-color: #119426;
+}

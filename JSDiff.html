@@ -344,6 +344,10 @@ function removeCycle(selectedID){
     $('#'+divId).append("<div class='" + divClass + "' id='" + eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");
   }
 
+    function addEventDiv(divId, divClass, eventType, key, mouseOver){
+    $('#'+divId).append("<div class='" + divClass + "' id='" + eventType + "' onClick='decodeAndSet(" +key+ ")' title="+JSON.stringify(mouseOver)+"></div>");
+  }
+
   function addEvent(event,key){
     if (!(typeof event.entityAddress === "undefined")){ 
       if(event.entityAddress.indexOf(".java") > -1){
@@ -357,7 +361,11 @@ function removeCycle(selectedID){
       }
 
     }else{
-      addEventDiv("events", "eventDiv", event.eventType, key);
+      if(event.eventType === 'testRun'){
+        addEventDiv("events", "eventDiv", event.eventType+"_"+event.testResult, key,event);
+      }else{
+        addEventDiv("events", "eventDiv", event.eventType, key);
+      }
       addPlaceHolders("events", "placeHolder",key);
     }
   }else{
