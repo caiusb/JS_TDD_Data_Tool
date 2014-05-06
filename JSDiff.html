@@ -395,7 +395,10 @@ function findAllFiles(allJSONData){
 
 
 $(document).ready(function(){
-  $.getJSON( "intermediateJSON.json", function( data ) {
+
+ var filename = window.location.href.split("?")[1].split("=")[1];
+
+  $.getJSON("uploads/"+filename, function( data ) {
    allJSONData = data;
    var items = [];
    var fileNames = findAllFiles(allJSONData);
