@@ -425,9 +425,9 @@ $(function() {
       .click(function( event ) {
         console.log("SAVE CYCLES");
         console.log(TDDCycles);
+        $.post("ajax/saveAnnotations.php",{ 'TDDCycles': TDDCycles , 'filename':filename);
       });
   });
-
 
 
 </script>
