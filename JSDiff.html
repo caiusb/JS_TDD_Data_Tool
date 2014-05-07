@@ -10,7 +10,7 @@
   <script src="src/jquery.ui.position.js" type="text/javascript"></script>
   <script src="src/jquery.contextMenu.js" type="text/javascript"></script>
   <script src="screen.js" type="text/javascript"></script>
-
+  <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
   <link href="src/jquery.contextMenu.css" rel="stylesheet" type="text/css" />
   <link href="screen.css" rel="stylesheet" type="text/css" />
 
@@ -22,6 +22,7 @@
     <label><input type="radio" name="diff_type" value="diffChars" checked> Chars</label>
     <label><input type="radio" name="diff_type" value="diffWords"> Words</label>
     <label><input type="radio" name="diff_type" value="diffLines"> Lines</label>
+        <button>Save Annotations</button>
   </div>
 
   <a href="https://github.com/kpdecker/jsdiff" class="source">github.com/kpdecker/jsdiff</a>
@@ -125,6 +126,8 @@
     var fileNames = {};
 
     var TDDCycles = [];
+
+    var filename;
 
     var currStart;
     var currEnd;
@@ -396,7 +399,7 @@ function findAllFiles(allJSONData){
 
 $(document).ready(function(){
 
- var filename = window.location.href.split("?")[1].split("=")[1];
+ filename = window.location.href.split("?")[1].split("=")[1];
 
   $.getJSON("uploads/"+filename, function( data ) {
    allJSONData = data;
@@ -415,6 +418,15 @@ $(document).ready(function(){
  });
 });
 
+
+$(function() {
+    $("button")
+      .button()
+      .click(function( event ) {
+        console.log("SAVE CYCLES");
+        console.log(TDDCycles);
+      });
+  });
 
 
 

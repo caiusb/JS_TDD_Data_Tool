@@ -49,7 +49,7 @@ ins {
 	left: 5px;
 	right: 5px;
 	height: 2em;
-	line-height: 2em;
+	line-height: 1em;
 }
 #settings label {
 	margin-left: 1em;
