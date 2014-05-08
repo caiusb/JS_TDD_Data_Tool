@@ -221,16 +221,31 @@
 			changed();
 		}
 
-		function createCycle(){
+		function createCycle(key, options){
 			// console.log(selectionStart);
 			// console.log(selectionEnd);
 			currStart = selectionStart;
 			currEnd = selectionEnd;
-			TDDCycles.push({"id":currStart+currEnd,"CycleType":"red","CycleStart":currStart,"CycleEnd":currEnd});
+			if(key === "Test"){
+				TDDCycles.push({"id":currStart+currEnd,"CycleType":"red","CycleStart":currStart,"CycleEnd":currEnd});
+			}else if(key === "Code"){
+				TDDCycles.push({"id":currStart+currEnd,"CycleType":"green","CycleStart":currStart,"CycleEnd":currEnd});
+			}else if(key === "Refactor"){
+				TDDCycles.push({"id":currStart+currEnd,"CycleType":"blue","CycleStart":currStart,"CycleEnd":currEnd});
+			}
+
 			for (var i=Number(currStart);i<=Number(currEnd);i++)
 			{
 			    //$('#TDD'+i).css( "background-color", "#990000");
-			    $('#TDD'+i).addClass(currStart+currEnd+ " REDCYCLE");
+			    if(key === "Test"){
+					$('#TDD'+i).addClass(currStart+currEnd+ " REDCYCLE");
+				}else if(key === "Code"){
+					$('#TDD'+i).addClass(currStart+currEnd+ " GREENCYCLE");
+				}else if(key === "Refactor"){
+					$('#TDD'+i).addClass(currStart+currEnd+ " BLUECYCLE");
+				}
+
+			    
 			    $('#TDD'+i).unbind();
 			    $.contextMenu({
 			    	selector: '#TDD'+i, 
@@ -250,7 +265,9 @@
 			    	selector: elem, 
 			    	callback: createCycle,
 			    	items: {
-			    		"CreateCycle": {name: "CreateCycle", icon: "cycle"}
+			    		"Test": {name: "TestCycle", icon: "cycle"},
+			    		"Code": {name: "CodeCycle", icon: "cycle"},
+			    		"Refactor": {name: "RefactorCycle", icon: "cycle"}
 			    	}
 			    });
 		}
