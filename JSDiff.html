@@ -379,6 +379,8 @@ function removeCycle(selectedID){
 
 }
 
+
+
 function findAllFiles(allJSONData){
 
   fileNames["TDDCycles"] = 1;
@@ -397,6 +399,25 @@ function findAllFiles(allJSONData){
 }
 
 
+function loadCyclesFromServer(){
+    $.getJSON("ajax/Cycles_"+filename, function( data ) {
+   TDDCycles = data;
+   // var items = [];
+   // var fileNames = findAllFiles(allJSONData);
+   console.log(TDDCycles);
+   addColorandListeners();
+  //  $.each(fileNames, function( key, val ) {
+  //   $('#allEvents').append("<div class='rowContainer' id='"+key+"Row'><div class='spacer'><div class='rowLabel'>"+key+"</div></div><div class='fileRow' id='" + getSafePath(key) + "' ></div></div>");   
+  // });
+
+  //  $.each( allJSONData, function( key, val ) {
+  //   addEvent(val,key);
+  // });
+  //  addListeners();
+
+ });
+}
+
 $(document).ready(function(){
 
  filename = window.location.href.split("?")[1].split("=")[1];
@@ -414,8 +435,11 @@ $(document).ready(function(){
     addEvent(val,key);
   });
    addListeners();
-
+   loadCyclesFromServer();
  });
+
+
+
 });
 
 
@@ -425,7 +449,7 @@ $(function() {
       .click(function( event ) {
         console.log("SAVE CYCLES");
         console.log(TDDCycles);
-        $.post("ajax/saveAnnotations.php",{ 'TDDCycles': TDDCycles , 'filename':filename);
+        $.post("ajax/saveAnnotations.php",{ 'TDDCycles': TDDCycles , 'filename':filename});
       });
   });
 
