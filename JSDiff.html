@@ -138,16 +138,19 @@
 		function findPreviousTextChange(startSelection){
 			var i = startSelection-1;
 			var currSelection = $('#'+selectionRow+" "+"#"+i);
-			while(!currSelection.hasClass("textChange")){
+			while(!currSelection.hasClass("textChange")&& i>0){
 				i = i-1;
 				currSelection = $('#'+selectionRow+" "+"#"+i);
+			}
+			if(i <1 ){
+				return startSelection;
 			}
 			return i;
 		}	
 		function findNextTextChange(startSelection){
 			var i = startSelection+1;
 			var currSelection = $('#'+selectionRow+" "+"#"+i);
-			while(!currSelection.hasClass("textChange")){
+			while(!currSelection.hasClass("textChange") && i<allJSONData.length){
 				i = i+1;
 				currSelection = $('#'+selectionRow+" "+"#"+i);
 			}
@@ -162,32 +165,37 @@
 		}
 
 		function shiftStartLeft(){
-			console.log("shiftStartLeft");
+			// console.log("shiftStartLeft");
 			var prevTextChange = findPreviousTextChange(selectionStart);
-			$('#'+selectionRow+" "+"#"+prevTextChange).addClass("firstSelection");
-			$('#'+selectionRow+" "+"#"+selectionStart).removeClass("firstSelection").addClass("midSelection");
-			selectionStart = prevTextChange;
-			$("#a").empty().text(allJSONData[selectionStart].currText);
-			changed();
+			if(prevTextChange != selectionStart){
+				$('#'+selectionRow+" "+"#"+prevTextChange).addClass("firstSelection");
+				$('#'+selectionRow+" "+"#"+selectionStart).removeClass("firstSelection").addClass("midSelection");
+				selectionStart = prevTextChange;
+				$("#a").empty().text(allJSONData[selectionStart].currText);
+				changed();
+				addRightClickHandeler('#'+selectionRow+" "+"#"+prevTextChange);
+			}
 		}
 
 		function shiftStartRight(){
-			console.log("shiftStartRight");
+			// console.log("shiftStartRight");
 			var nextTextChange = findNextTextChange(selectionStart);
 			$('#'+selectionRow+" "+"#"+nextTextChange).addClass("firstSelection");
 			$('#'+selectionRow+" "+"#"+selectionStart).removeClass("firstSelection midSelection");
 			selectionStart = nextTextChange;
 			$("#a").empty().text(allJSONData[selectionStart].currText);
 			changed();
+			$.contextMenu('destroy','#'+selectionRow+" "+"#"+selectionStart);
 		}
 		function shiftEndLeft(){
-			console.log("shiftEndLeft");
+			// console.log("shiftEndLeft");
 			var prevTextChange = findPreviousTextChange(selectionEnd);
 			$('#'+selectionRow+" "+"#"+prevTextChange).addClass("lastSelection");
 			$('#'+selectionRow+" "+"#"+selectionEnd).removeClass("lastSelection midSelection");
 			selectionEnd = prevTextChange;
 			$("#b").empty().text(allJSONData[selectionEnd].currText);
 			changed();
+			$.contextMenu('destroy','#'+selectionRow+" "+"#"+selectionEnd);
 
 		}
 		function shiftEndRight(element){
@@ -198,6 +206,7 @@
 			selectionEnd = nextTextChange;
 			$("#b").empty().text(allJSONData[selectionEnd].currText);
 			changed();
+			addRightClickHandeler('#'+selectionRow+" "+"#"+nextTextChange);
 		}
 
 		function eventClickHandeler(Idx,element){
@@ -212,6 +221,16 @@
 			changed();
 		}
 
+		function addRightClickHandeler(elem){
+		$.contextMenu({
+			    	selector: elem, 
+			    	callback: TDDCallback,
+			    	items: {
+			    		"CreateCycle": {name: "CreateCycle", icon: "cycle"}
+			    	}
+			    });
+		}
+
 		function createSelection(first,last,element){
 			selectionStart = first;
 			selectionEnd = last;
@@ -221,12 +240,15 @@
 			console.log("last:"+ last);
 			$('#'+selectionRow+" "+"#"+first).addClass("firstSelection");
 			$('#'+selectionRow+" "+"#"+last).addClass("lastSelection");
+			addRightClickHandeler('#'+selectionRow+" "+"#"+first);
+			addRightClickHandeler('#'+selectionRow+" "+"#"+last);
 			for (var i=Number(first+1);i<=Number(last-1);i++)
 			{
 				$('#'+selectionRow+" "+"#"+i).addClass("midSelection");
+				addRightClickHandeler('#'+selectionRow+" "+"#"+i);
 			}
 
-			$(document).off();
+			$('#'+selectionRow).off();
 
 			$(document).keydown(function(e){
 			    if (e.keyCode == 37) { 
@@ -246,6 +268,8 @@
 			       return false;
 			    }
 			});
+
+
 		}
 
 		function checkAndSet(fileName) {
@@ -269,16 +293,6 @@
 			return path.replace(/\//g, '').replace(/\./g, '');
 		}
 
-		// function addColumn(event,key){
-		// 	$.each( AllFiles, function( key1, val1 ) {
-		// 		if(event.entityAddress === key1.entityAddress){
-		// 			$('#'+getSafePath(event.entityAddress)).append("<div class='eventDiv' id='" + event.eventType + "' onClick='eventClickHandeler(" +key+ ")'></div>");  
-
-		// 		}else{
-		// 			$('#'+getSafePath(val.entityAddress)).append("<div class='placeHolder' id='" + val.eventType + "'></div>");
-		// 		}
-		// 	});
-		// }
 
 		function addPlaceHolders(currRow, divClass, idx){
 			$.each(fileNames, function( key, val ) {
@@ -568,6 +582,7 @@
   		$.post("ajax/saveAnnotations.php",{ 'TDDCycles': TDDCycles , 'filename':filename});
   	});
   });
+
 
 
 </script>
