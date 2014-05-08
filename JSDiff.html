@@ -105,37 +105,9 @@
 			}
 		}
 
-		function findFirstTextChange(Idx){
-			while(Idx > 0 && allJSONData[Idx].eventType === "textChange"){
-				 Idx--;
-			}
-			return Idx+1;
-		}	
+		
 
-		function findLastTextChange(Idx){
-			while(Idx < allJSONData.length && allJSONData[Idx].eventType === "textChange"){
-				 Idx++;
-			}
-			return Idx-1;
-		}
-
-		function eventClickHandeler(Idx){
-			//Handle Text Changes
-			if(allJSONData[Idx].eventType === "textChange"){
-				var first = findFirstTextChange(Idx);
-				var last = findLastTextChange(Idx);
-				$("#a").empty().text(allJSONData[first].currText);
-				$("#b").empty().text(allJSONData[last].currText);
-			}
-			// if(lastUpdate == 'B'){
-			// 	$("#a").empty().text(allJSONData[Idx].currText);
-			// 	lastUpdate = "A";
-			// }else{
-			// 	$("#b").empty().text(allJSONData[Idx].currText);
-			// 	lastUpdate = "B";
-			// }
-			changed();
-		}
+		
 
 
 	</script>
@@ -152,6 +124,130 @@
 		var currStart;
 		var currEnd;
 
+		var selectionStart;
+		var selectionEnd;
+		var selectionRow;
+
+		function findFirstTextChange(Idx){
+			while(Idx > 0 && allJSONData[Idx].eventType === "textChange"){
+				 Idx--;
+			}
+			return Idx+1;
+		}	
+
+		function findPreviousTextChange(startSelection){
+			var i = startSelection-1;
+			var currSelection = $('#'+selectionRow+" "+"#"+i);
+			while(!currSelection.hasClass("textChange")){
+				i = i-1;
+				currSelection = $('#'+selectionRow+" "+"#"+i);
+			}
+			return i;
+		}	
+		function findNextTextChange(startSelection){
+			var i = startSelection+1;
+			var currSelection = $('#'+selectionRow+" "+"#"+i);
+			while(!currSelection.hasClass("textChange")){
+				i = i+1;
+				currSelection = $('#'+selectionRow+" "+"#"+i);
+			}
+			return i;
+		}
+
+		function findLastTextChange(Idx){
+			while(Idx < allJSONData.length && allJSONData[Idx].eventType === "textChange"){
+				 Idx++;
+			}
+			return Idx-1;
+		}
+
+		function shiftStartLeft(){
+			console.log("shiftStartLeft");
+			var prevTextChange = findPreviousTextChange(selectionStart);
+			$('#'+selectionRow+" "+"#"+prevTextChange).addClass("firstSelection");
+			$('#'+selectionRow+" "+"#"+selectionStart).removeClass("firstSelection").addClass("midSelection");
+			selectionStart = prevTextChange;
+			$("#a").empty().text(allJSONData[selectionStart].currText);
+			changed();
+		}
+
+		function shiftStartRight(){
+			console.log("shiftStartRight");
+			var nextTextChange = findNextTextChange(selectionStart);
+			$('#'+selectionRow+" "+"#"+nextTextChange).addClass("firstSelection");
+			$('#'+selectionRow+" "+"#"+selectionStart).removeClass("firstSelection midSelection");
+			selectionStart = nextTextChange;
+			$("#a").empty().text(allJSONData[selectionStart].currText);
+			changed();
+		}
+		function shiftEndLeft(){
+			console.log("shiftEndLeft");
+			var prevTextChange = findPreviousTextChange(selectionEnd);
+			$('#'+selectionRow+" "+"#"+prevTextChange).addClass("lastSelection");
+			$('#'+selectionRow+" "+"#"+selectionEnd).removeClass("lastSelection midSelection");
+			selectionEnd = prevTextChange;
+			$("#b").empty().text(allJSONData[selectionEnd].currText);
+			changed();
+
+		}
+		function shiftEndRight(element){
+			//console.log("shiftEndRight");
+			var nextTextChange = findNextTextChange(selectionEnd);
+			$('#'+selectionRow+" "+"#"+nextTextChange).addClass("lastSelection");
+			$('#'+selectionRow+" "+"#"+selectionEnd).removeClass("lastSelection").addClass("midSelection");
+			selectionEnd = nextTextChange;
+			$("#b").empty().text(allJSONData[selectionEnd].currText);
+			changed();
+		}
+
+		function eventClickHandeler(Idx,element){
+			//Handle Text Changes
+			if(allJSONData[Idx].eventType === "textChange"){
+				var first = findFirstTextChange(Idx);
+				var last = findLastTextChange(Idx);
+				createSelection(first,last,element);
+				$("#a").empty().text(allJSONData[first].currText);
+				$("#b").empty().text(allJSONData[last].currText);
+			}
+			changed();
+		}
+
+		function createSelection(first,last,element){
+			selectionStart = first;
+			selectionEnd = last;
+			selectionRow = element.parentElement.id;
+			$( "div" ).removeClass( "firstSelection midSelection lastSelection");
+			console.log("first:"+ first);
+			console.log("last:"+ last);
+			$('#'+selectionRow+" "+"#"+first).addClass("firstSelection");
+			$('#'+selectionRow+" "+"#"+last).addClass("lastSelection");
+			for (var i=Number(first+1);i<=Number(last-1);i++)
+			{
+				$('#'+selectionRow+" "+"#"+i).addClass("midSelection");
+			}
+
+			$(document).off();
+
+			$(document).keydown(function(e){
+			    if (e.keyCode == 37) { 
+			    	if(e.shiftKey){
+			    		shiftStartLeft(element);
+			    	}else{
+			    		shiftEndLeft(element);
+			    	}			   
+			       return false;
+			    }
+			    if (e.keyCode == 39) { 
+			       if(e.shiftKey){
+			    		shiftStartRight(element);
+			    	}else{
+			    		shiftEndRight(element);
+			    	}	
+			       return false;
+			    }
+			});
+		}
+
 		function checkAndSet(fileName) {
 			if (!(typeof fileName === "undefined")){ 
 				if(fileName.indexOf(".java") > -1){
@@ -167,19 +263,22 @@
 		}
 
 		function getSafePath(path){
+			if(path === undefined){
+				return "";
+			}
 			return path.replace(/\//g, '').replace(/\./g, '');
 		}
 
-		function addColumn(event,key){
-			$.each( AllFiles, function( key1, val1 ) {
-				if(event.entityAddress === key1.entityAddress){
-					$('#'+getSafePath(event.entityAddress)).append("<div class='eventDiv' id='" + event.eventType + "' onClick='eventClickHandeler(" +key+ ")'></div>");  
+		// function addColumn(event,key){
+		// 	$.each( AllFiles, function( key1, val1 ) {
+		// 		if(event.entityAddress === key1.entityAddress){
+		// 			$('#'+getSafePath(event.entityAddress)).append("<div class='eventDiv' id='" + event.eventType + "' onClick='eventClickHandeler(" +key+ ")'></div>");  
 
-				}else{
-					$('#'+getSafePath(val.entityAddress)).append("<div class='placeHolder' id='" + val.eventType + "'></div>");
-				}
-			});
-		}
+		// 		}else{
+		// 			$('#'+getSafePath(val.entityAddress)).append("<div class='placeHolder' id='" + val.eventType + "'></div>");
+		// 		}
+		// 	});
+		// }
 
 		function addPlaceHolders(currRow, divClass, idx){
 			$.each(fileNames, function( key, val ) {
@@ -372,11 +471,11 @@
   }
 
   function addEventDiv(divId, divClass, eventType, key){
-  	$('#'+divId).append("<div class='" + divClass + "' id='" + eventType + "' onClick='eventClickHandeler(" +key+ ")'></div>");
+  	$('#'+divId).append("<div class='" + divClass + " " + eventType + "' id='"+key+"' onClick='eventClickHandeler(" +key+ ",this)'></div>");
   }
 
   function addEventDiv(divId, divClass, eventType, key, mouseOver){
-  	$('#'+divId).append("<div class='" + divClass + "' id='" + eventType + "' onClick='eventClickHandeler(" +key+ ")' title="+JSON.stringify(mouseOver)+"></div>");
+  	$('#'+divId).append("<div class='" + divClass + " " + eventType + "' id='"+key+"' onClick='eventClickHandeler(" +key+ ",this)' title="+JSON.stringify(mouseOver)+"></div>");
   }
 
   function addEvent(event,key){

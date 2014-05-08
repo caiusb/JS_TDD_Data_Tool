@@ -111,8 +111,9 @@ ins {
 	background-color:darkgray;
 }
 
-#textChange{
+.textChange{
 	background-color:#c34500;
+	opacity: 0.2;
 }
 
 .fileRow{
@@ -212,3 +213,39 @@ width: 1px;
 #testRun_OK{
 	background-color: #4e7300;
 }
+
+
+.firstSelection{
+	opacity: 0.8;
+	border-top: 2px solid black;
+	height: 16px;
+	border-bottom: 2px solid black;
+	border-left: 2px solid black;
+}
+.midSelection{
+	opacity: 0.8;
+	border-top: 2px solid black;
+	height: 16px;
+	border-bottom: 2px solid black;
+}
+.lastSelection{
+	opacity: 0.8;
+	border-top: 2px solid black;
+	height: 16px;
+	border-bottom: 2px solid black;
+	border-right: 2px solid black;
+}
+
+.eventDiv.firstSelection{
+	width:6px;
+}
+
+.eventDiv.lastSelection{
+	width:6px;
+}
+
+
+
+
+
+
