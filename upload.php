@@ -1,5 +1,7 @@
 <?php
 
+
+
 // A list of permitted file extensions
 $allowed = array('png', 'jpg', 'gif','zip','json');
 
@@ -12,7 +14,7 @@ if(isset($_FILES['upl']) && $_FILES['upl']['error'] == 0){
 		exit;
 	}
 
-	if(move_uploaded_file($_FILES['upl']['tmp_name'], 'uploads/'.$_FILES['upl']['name'])){
+	if(move_uploaded_file($_FILES['upl']['tmp_name'], 'uploads/'.date('d-m-Y-H-i-s').'-'.$_FILES['upl']['name'])){
 		echo '{"status":"success"}';
 		exit;
 	}
