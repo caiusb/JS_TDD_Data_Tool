@@ -1,456 +1,473 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>Diff</title>
-  <link rel="stylesheet" href="style.css"/>
-  <script src="jquery-2.1.0.js"></script>
+	<meta charset="utf-8">
+	<title>Diff</title>
+	<link rel="stylesheet" href="style.css"/>
+	<script src="jquery-2.1.0.js"></script>
 
 
-  <script src="src/jquery.ui.position.js" type="text/javascript"></script>
-  <script src="src/jquery.contextMenu.js" type="text/javascript"></script>
-  <script src="screen.js" type="text/javascript"></script>
-  <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
-  <link href="src/jquery.contextMenu.css" rel="stylesheet" type="text/css" />
-  <link href="screen.css" rel="stylesheet" type="text/css" />
+	<script src="src/jquery.ui.position.js" type="text/javascript"></script>
+	<script src="src/jquery.contextMenu.js" type="text/javascript"></script>
+	<script src="screen.js" type="text/javascript"></script>
+	<script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+	<link href="src/jquery.contextMenu.css" rel="stylesheet" type="text/css" />
+	<link href="screen.css" rel="stylesheet" type="text/css" />
 
 </head>
 <body>
 
-  <div id="settings">
-    <h1>Diff</h1>
-    <label><input type="radio" name="diff_type" value="diffChars" checked> Chars</label>
-    <label><input type="radio" name="diff_type" value="diffWords"> Words</label>
-    <label><input type="radio" name="diff_type" value="diffLines"> Lines</label>
-        <button>Save Annotations</button>
-  </div>
+	<div id="settings">
+		<h1>Diff</h1>
+		<label><input type="radio" name="diff_type" value="diffChars" checked> Chars</label>
+		<label><input type="radio" name="diff_type" value="diffWords"> Words</label>
+		<label><input type="radio" name="diff_type" value="diffLines"> Lines</label>
+		<button>Save Annotations</button>
+	</div>
 
-  <a href="https://github.com/kpdecker/jsdiff" class="source">github.com/kpdecker/jsdiff</a>
+	<a href="https://github.com/kpdecker/jsdiff" class="source">github.com/kpdecker/jsdiff</a>
 
-  <table>
-    <tr>
-      <td contenteditable="true" id="a">restaurant</td>
-      <td contenteditable="true" id="b">aura</td>
-      <td><pre id="result"></pre></td>
-    </tr>
-  </table>
+	<table>
+		<tr>
+			<td contenteditable="true" id="a">restaurant</td>
+			<td contenteditable="true" id="b">aura</td>
+			<td><pre id="result"></pre></td>
+		</tr>
+	</table>
 
-  <div id="bottomBar" >
-    Source Events
-    <div id="allEvents" >
-    </div>
-  </div>
-  <div id="Marker1"></div>
-
-
-
-  <script src="diff.js"></script>
-  <script defer>
-    var lastUpdate = 'B';
-    var a = document.getElementById('a');
-    var b = document.getElementById('b');
-    var result = document.getElementById('result');
-
-    function changed() {
-      var diff = JsDiff[window.diffType](a.textContent, b.textContent);
-      var fragment = document.createDocumentFragment();
-      for (var i=0; i < diff.length; i++) {
-
-        if (diff[i].added && diff[i + 1] && diff[i + 1].removed) {
-          var swap = diff[i];
-          diff[i] = diff[i + 1];
-          diff[i + 1] = swap;
-        }
-
-        var node;
-        if (diff[i].removed) {
-          node = document.createElement('del');
-          node.appendChild(document.createTextNode(diff[i].value));
-        } else if (diff[i].added) {
-          node = document.createElement('ins');
-          node.appendChild(document.createTextNode(diff[i].value));
-        } else {
-          node = document.createTextNode(diff[i].value);
-        }
-        fragment.appendChild(node);
-      }
-
-      result.textContent = '';
-      result.appendChild(fragment);
-    }
-
-    window.onload = function() {
-      onDiffTypeChange(document.querySelector('#settings [name="diff_type"]:checked'));
-      changed();
-    };
-
-    a.onpaste = a.onchange =
-    b.onpaste = b.onchange = changed;
-
-    if ('oninput' in a) {
-      a.oninput = b.oninput = changed;
-    } else {
-      a.onkeyup = b.onkeyup = changed;
-    }
-
-    function onDiffTypeChange(radio) {
-      window.diffType = radio.value;
-      document.title = "Diff " + radio.value.slice(4);
-    }
-
-    var radio = document.getElementsByName('diff_type');
-    for (var i = 0; i < radio.length; i++) {
-      radio[i].onchange = function(e) {
-        onDiffTypeChange(e.target);
-        changed();
-      }
-    }
-
-    function decodeAndSet(Idx){
-      if(lastUpdate == 'B'){
-        $("#a").empty().text(allJSONData[Idx].currText);
-        lastUpdate = "A";
-      }else{
-        $("#b").empty().text(allJSONData[Idx].currText);
-        lastUpdate = "B";
-      }
-      changed();
-    }
-
-
-  </script>
-  <script>
-
-    var allJSONData = [];
-
-    var fileNames = {};
-
-    var TDDCycles = [];
-
-    var filename;
-
-    var currStart;
-    var currEnd;
-
-    function checkAndSet(fileName) {
-      if (!(typeof fileName === "undefined")){ 
-        if(fileName.indexOf(".java") > -1){
-          AllFiles[fileName] = 1;
-        }else{
-          AllFiles["other"] = 1;
-        }
-      }
-    }
-
-    function setupFileDivs(AllFiles){
-      console.log(AllFiles);
-    }
-
-    function getSafePath(path){
-      return path.replace(/\//g, '').replace(/\./g, '');
-    }
-
-    function addColumn(event,key){
-      $.each( AllFiles, function( key1, val1 ) {
-        if(event.entityAddress === key1.entityAddress){
-         $('#'+getSafePath(event.entityAddress)).append("<div class='eventDiv' id='" + event.eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");  
-
-       }else{
-        $('#'+getSafePath(val.entityAddress)).append("<div class='placeHolder' id='" + val.eventType + "'></div>");
-      }
-    });
-    }
-
-    function addPlaceHolders(currRow, divClass, idx){
-      $.each(fileNames, function( key, val ) {
-        if(currRow === key){
-
-        }else{
-          if(key === 'TDDCycles'){
-            $('#'+getSafePath(key)).append("<div class='" + divClass + "' id=TDD" +idx+ " '></div>");
-          }else{
-           $('#'+getSafePath(key)).append("<div class='" + divClass + "'></div>");
-         }
-       }
-     });
-     $('.spacer').append("<div class='SPACER_" + divClass + "' id=Spacer" +idx+ "></div>");
-   }
+	<div id="bottomBar" >
+		<div id="allEvents" >
+		</div>
+	</div>
+	<div id="Marker1"></div>
 
 
 
+	<script src="diff.js"></script>
+	<script defer>
+		var lastUpdate = 'B';
+		var a = document.getElementById('a');
+		var b = document.getElementById('b');
+		var result = document.getElementById('result');
 
-   function addTDDCycle(idx){
-    $("#TDD"+idx).css( "background-color", "red" );
+		function changed() {
+			var diff = JsDiff[window.diffType](a.textContent, b.textContent);
+			var fragment = document.createDocumentFragment();
+			for (var i=0; i < diff.length; i++) {
 
-    var position = $("#TDD"+idx).offset(); 
-    $("#Marker1").css(position) 
-  }
+				if (diff[i].added && diff[i + 1] && diff[i + 1].removed) {
+					var swap = diff[i];
+					diff[i] = diff[i + 1];
+					diff[i + 1] = swap;
+				}
+
+				var node;
+				if (diff[i].removed) {
+					node = document.createElement('del');
+					node.appendChild(document.createTextNode(diff[i].value));
+				} else if (diff[i].added) {
+					node = document.createElement('ins');
+					node.appendChild(document.createTextNode(diff[i].value));
+				} else {
+					node = document.createTextNode(diff[i].value);
+				}
+				fragment.appendChild(node);
+			}
+
+			result.textContent = '';
+			result.appendChild(fragment);
+		}
+
+		window.onload = function() {
+			onDiffTypeChange(document.querySelector('#settings [name="diff_type"]:checked'));
+			changed();
+		};
+
+		a.onpaste = a.onchange =
+		b.onpaste = b.onchange = changed;
+
+		if ('oninput' in a) {
+			a.oninput = b.oninput = changed;
+		} else {
+			a.onkeyup = b.onkeyup = changed;
+		}
+
+		function onDiffTypeChange(radio) {
+			window.diffType = radio.value;
+			document.title = "Diff " + radio.value.slice(4);
+		}
+
+		var radio = document.getElementsByName('diff_type');
+		for (var i = 0; i < radio.length; i++) {
+			radio[i].onchange = function(e) {
+				onDiffTypeChange(e.target);
+				changed();
+			}
+		}
+
+		function findFirstTextChange(Idx){
+			while(Idx > 0 && allJSONData[Idx].eventType === "textChange"){
+				 Idx--;
+			}
+			return Idx+1;
+		}	
+
+		function findLastTextChange(Idx){
+			while(Idx < allJSONData.length && allJSONData[Idx].eventType === "textChange"){
+				 Idx++;
+			}
+			return Idx-1;
+		}
+
+		function eventClickHandeler(Idx){
+			//Handle Text Changes
+			if(allJSONData[Idx].eventType === "textChange"){
+				var first = findFirstTextChange(Idx);
+				var last = findLastTextChange(Idx);
+				$("#a").empty().text(allJSONData[first].currText);
+				$("#b").empty().text(allJSONData[last].currText);
+			}
+			// if(lastUpdate == 'B'){
+			// 	$("#a").empty().text(allJSONData[Idx].currText);
+			// 	lastUpdate = "A";
+			// }else{
+			// 	$("#b").empty().text(allJSONData[Idx].currText);
+			// 	lastUpdate = "B";
+			// }
+			changed();
+		}
 
 
-  function startCycle(el){
- console.log($(this).attr('id'));
- $(this).css( "background-color", "aqua");
+	</script>
+	<script>
 
-}
+		var allJSONData = [];
 
-function endCycle(el){
-  $(this).css( "background-color", "yellow");
-}
+		var fileNames = {};
 
-function isNumber(n) {
-  return !isNaN(parseFloat(n)) && isFinite(n);
-}
+		var TDDCycles = [];
 
-function addListeners(){
-  $('#TDDCycles').mousedown(function(event) {
-   var clickedElement = event.target;
-   console.log(clickedElement.id);
-   currStart = clickedElement.id.substr(3);
- });
+		var filename;
 
-  $('#TDDCycles').mouseup(function(event) {
-   var clickedElement = event.target;
-   console.log(clickedElement.id);
-   currEnd = clickedElement.id.substr(3);
-   console.log(currStart + "_" + currEnd);
+		var currStart;
+		var currEnd;
 
-  TDDCycles.push({"id":currStart+currEnd,"CycleType":"red","CycleStart":currStart,"CycleEnd":currEnd});
-  //addColorandListeners();
-        for (var i=Number(currStart);i<=Number(currEnd);i++)
-      {
-        //$('#TDD'+i).css( "background-color", "#990000");
-        $('#TDD'+i).addClass(currStart+currEnd+ " REDCYCLE");
-        $('#TDD'+i).unbind();
-        $.contextMenu({
-          selector: '#TDD'+i, 
-          callback: function(key, options) {
+		function checkAndSet(fileName) {
+			if (!(typeof fileName === "undefined")){ 
+				if(fileName.indexOf(".java") > -1){
+					AllFiles[fileName] = 1;
+				}else{
+					AllFiles["other"] = 1;
+				}
+			}
+		}
 
-            var arrOfClasses = this[0].className.split(" ");
-            var CycleID ;
-            arrOfClasses.forEach(function(entry) {
-              if(isNumber(entry)){
-                CycleID = entry;
-              }
-            });
+		function setupFileDivs(AllFiles){
+			console.log(AllFiles);
+		}
 
-            if(key === "writingTests"){
+		function getSafePath(path){
+			return path.replace(/\//g, '').replace(/\./g, '');
+		}
 
-              $("."+CycleID).removeClass("GREENCYCLE");
-              $("."+CycleID).removeClass("BLUECYCLE");
-              $("."+CycleID).addClass("REDCYCLE");
-            }
-            if(key === "writingCode"){
-              $("."+CycleID).removeClass("REDCYCLE");
-              $("."+CycleID).removeClass("BLUECYCLE");
-              $("."+CycleID).addClass("GREENCYCLE");
-            }
-            if(key === "refactoring"){
-              $("."+CycleID).removeClass("GREENCYCLE");
-              $("."+CycleID).removeClass("REDCYCLE");
-              $("."+CycleID).addClass("BLUECYCLE");
-            }
-            if(key === "delete"){
-              removeCycle(this[0].getAttribute('id').substr(3))
-            }
-            
-          },
-          items: {
-            "writingTests": {name: "Tests", icon: "tests"},
-            "writingCode": {name: "Code", icon: "code"},
-            "refactoring": {name: "Refactor", icon: "refactor"},
-            "delete": {name: "Delete", icon: "delete"}
-          }
-        });
-      }
-});
-}
+		function addColumn(event,key){
+			$.each( AllFiles, function( key1, val1 ) {
+				if(event.entityAddress === key1.entityAddress){
+					$('#'+getSafePath(event.entityAddress)).append("<div class='eventDiv' id='" + event.eventType + "' onClick='eventClickHandeler(" +key+ ")'></div>");  
 
-function addColorandListeners(){
-  TDDCycles.forEach(function(entry) {
-      for (var i=Number(entry.CycleStart);i<=Number(entry.CycleEnd);i++)
-      {
-        //$('#TDD'+i).css( "background-color", "#990000");
-        $('#TDD'+i).addClass("REDCYCLE "+entry.CycleStart+entry.CycleEnd);
+				}else{
+					$('#'+getSafePath(val.entityAddress)).append("<div class='placeHolder' id='" + val.eventType + "'></div>");
+				}
+			});
+		}
 
-        $.contextMenu({
-          selector: '#TDD'+i, 
-          callback: function(key, options) {
-            if(key === "writingTests"){
+		function addPlaceHolders(currRow, divClass, idx){
+			$.each(fileNames, function( key, val ) {
+				if(currRow === key){
 
-            }
-            if(key === "writingCode"){
+				}else{
+					if(key === 'TDDCycles'){
+						$('#'+getSafePath(key)).append("<div class='" + divClass + "' id=TDD" +idx+ " '></div>");
+					}else{
+						$('#'+getSafePath(key)).append("<div class='" + divClass + "'></div>");
+					}
+				}
+			});
+			$('.spacer').append("<div class='SPACER_" + divClass + "' id=Spacer" +idx+ "></div>");
+		}
 
-            }
-            if(key === "refactoring"){
 
-            }
-            if(key === "delete"){
-              removeCycle(this[0].getAttribute('id').substr(3))
-            }
-            
-          },
-          items: {
-            "writingTests": {name: "Tests", icon: "tests"},
-            "writingCode": {name: "Code", icon: "code"},
-            "refactoring": {name: "Refactor", icon: "refactor"},
-            "delete": {name: "Delete", icon: "delete"}
-          }
-        });
-      }
-  });
-}
 
-function removeCycle(selectedID){
-  console.log("REMOVE "+selectedID);
-  var newLoop = [];
-  TDDCycles.forEach(function(entry) {
-    //console.log(entry.CycleStart);
-    var numCycleStart = Number(entry.CycleStart);
-    var numCycleEnd = Number(entry.CycleEnd);
-    if(numCycleStart <= selectedID && selectedID <= numCycleEnd){
-      for (var i=numCycleStart;i<=numCycleEnd;i++)
-      {
-        $('#TDD'+i).removeClass("REDCYCLE");
-        $.contextMenu('destroy' ,'#TDD'+i);
-      }
-    }else{
-      newLoop.push(entry);
-    }
-  });
-  TDDCycles = newLoop;
-}
+
+		function addTDDCycle(idx){
+			$("#TDD"+idx).css( "background-color", "red" );
+
+			var position = $("#TDD"+idx).offset(); 
+			$("#Marker1").css(position) 
+		}
+
+
+		function startCycle(el){
+			console.log($(this).attr('id'));
+			$(this).css( "background-color", "aqua");
+
+		}
+
+		function endCycle(el){
+			$(this).css( "background-color", "yellow");
+		}
+
+		function isNumber(n) {
+			return !isNaN(parseFloat(n)) && isFinite(n);
+		}
+
+	function updateTDDCycle(cycleID,cycleType){
+		TDDCycles.forEach(function(currCycle){
+			if(currCycle.id === cycleID){
+				currCycle.CycleType = cycleType;
+			}
+		});
+	}
+
+	function TDDCallback(key, options) {
+
+		var arrOfClasses = this[0].className.split(" ");
+		var CycleID ;
+		arrOfClasses.forEach(function(entry) {
+			if(isNumber(entry)){
+				CycleID = entry;
+				return;
+			}
+		});
+		console.log(CycleID);
+		if(key === "writingTests"){
+
+			$("."+CycleID).removeClass("GREENCYCLE");
+			$("."+CycleID).removeClass("BLUECYCLE");
+			$("."+CycleID).addClass("REDCYCLE");
+			updateTDDCycle(CycleID,"red");
+		}
+		if(key === "writingCode"){
+			$("."+CycleID).removeClass("REDCYCLE");
+			$("."+CycleID).removeClass("BLUECYCLE");
+			$("."+CycleID).addClass("GREENCYCLE");
+			updateTDDCycle(CycleID,"green");
+		}
+		if(key === "refactoring"){
+			$("."+CycleID).removeClass("GREENCYCLE");
+			$("."+CycleID).removeClass("REDCYCLE");
+			$("."+CycleID).addClass("BLUECYCLE");
+			updateTDDCycle(CycleID,"blue");
+		}
+		if(key === "delete"){
+			removeCycle(this[0].getAttribute('id').substr(3))
+		}
+
+	}
+
+
+	function addListeners(){
+		$('#TDDCycles').mousedown(function(event) {
+			var clickedElement = event.target;
+			console.log(clickedElement.id);
+			currStart = clickedElement.id.substr(3);
+		});
+
+		$('#TDDCycles').mouseup(function(event) {
+			var clickedElement = event.target;
+			console.log(clickedElement.id);
+			currEnd = clickedElement.id.substr(3);
+			console.log(currStart + "_" + currEnd);
+
+			TDDCycles.push({"id":currStart+currEnd,"CycleType":"red","CycleStart":currStart,"CycleEnd":currEnd});
+			for (var i=Number(currStart);i<=Number(currEnd);i++)
+			{
+			    //$('#TDD'+i).css( "background-color", "#990000");
+			    $('#TDD'+i).addClass(currStart+currEnd+ " REDCYCLE");
+			    $('#TDD'+i).unbind();
+			    $.contextMenu({
+			    	selector: '#TDD'+i, 
+			    	callback: TDDCallback,
+			    	items: {
+			    		"writingTests": {name: "Tests", icon: "tests"},
+			    		"writingCode": {name: "Code", icon: "code"},
+			    		"refactoring": {name: "Refactor", icon: "refactor"},
+			    		"delete": {name: "Delete", icon: "delete"}
+			    	}
+			    });
+			}
+		});
+	}
+
+
+
+	function addColorandListeners(){
+		TDDCycles.forEach(function(entry) {
+			var currCycle;
+			if(entry.CycleType === 'red'){
+				currCycle = "REDCYCLE";
+			}else if(entry.CycleType === 'green'){
+				currCycle = "GREENCYCLE";
+			}else if(entry.CycleType === 'blue'){
+				currCycle = "BLUECYCLE";
+			}
+			for (var i=Number(entry.CycleStart);i<=Number(entry.CycleEnd);i++){
+		        $('#TDD'+i).addClass(currCycle+" "+entry.CycleStart+entry.CycleEnd);
+		        $.contextMenu({
+		        	selector: '#TDD'+i, 
+		        	callback: TDDCallback,
+		        	items: {
+		        		"writingTests": {name: "Tests", icon: "tests"},
+		        		"writingCode": {name: "Code", icon: "code"},
+		        		"refactoring": {name: "Refactor", icon: "refactor"},
+		        		"delete": {name: "Delete", icon: "delete"}
+		        	}
+		        });
+		    }
+		});
+	}
+
+	function removeCycle(selectedID){
+		console.log("REMOVE "+selectedID);
+		var newLoop = [];
+		TDDCycles.forEach(function(entry) {
+			//console.log(entry.CycleStart);
+			var numCycleStart = Number(entry.CycleStart);
+			var numCycleEnd = Number(entry.CycleEnd);
+			if(numCycleStart <= selectedID && selectedID <= numCycleEnd){
+				for (var i=numCycleStart;i<=numCycleEnd;i++){
+		    		$('#TDD'+i).removeClass("REDCYCLE");
+		    		$('#TDD'+i).removeClass("BLUECYCLE");
+		    		$('#TDD'+i).removeClass("GREENCYCLE");
+					$.contextMenu('destroy' ,'#TDD'+i);
+				}
+			}else{	
+				newLoop.push(entry);
+			}
+		});
+		TDDCycles = newLoop;
+	}
 
 
   //precondition: key refers to event on java file
   function isMiddleJavaTextChangeEvent(key, allJSONData){
 
-  var currentEvent = allJSONData[key];
-  var previousEvent = allJSONData[key - 1];
-  var nextEvent = allJSONData[key + 1];
+  	var currentEvent = allJSONData[key];
+  	var previousEvent = allJSONData[key - 1];
+  	var nextEvent = allJSONData[key + 1];
 
-  var isFirstEvent = key === 0;
-  var isLastEvent = key === allJSONData.length - 1;
+  	var isFirstEvent = key === 0;
+  	var isLastEvent = key === allJSONData.length - 1;
 
-  if(currentEvent.eventType != "textChange")
-    return false;
+  	if(currentEvent.eventType != "textChange")
+  		return false;
 
-  if(isFirstEvent || previousEvent.eventType != "textChange")
-    return false;
+  	if(isFirstEvent || previousEvent.eventType != "textChange")
+  		return false;
 
-  if (isLastEvent || nextEvent.eventType != "textChange")
-    return false;
+  	if (isLastEvent || nextEvent.eventType != "textChange")
+  		return false;
 
-  return true;
+  	return true;
   }
 
   function addEventDiv(divId, divClass, eventType, key){
-    $('#'+divId).append("<div class='" + divClass + "' id='" + eventType + "' onClick='decodeAndSet(" +key+ ")'></div>");
+  	$('#'+divId).append("<div class='" + divClass + "' id='" + eventType + "' onClick='eventClickHandeler(" +key+ ")'></div>");
   }
 
-    function addEventDiv(divId, divClass, eventType, key, mouseOver){
-    $('#'+divId).append("<div class='" + divClass + "' id='" + eventType + "' onClick='decodeAndSet(" +key+ ")' title="+JSON.stringify(mouseOver)+"></div>");
+  function addEventDiv(divId, divClass, eventType, key, mouseOver){
+  	$('#'+divId).append("<div class='" + divClass + "' id='" + eventType + "' onClick='eventClickHandeler(" +key+ ")' title="+JSON.stringify(mouseOver)+"></div>");
   }
 
   function addEvent(event,key){
-    if (!(typeof event.entityAddress === "undefined")){ 
-      if(event.entityAddress.indexOf(".java") > -1){
+  	if (!(typeof event.entityAddress === "undefined")){ 
+  		if(event.entityAddress.indexOf(".java") > -1){
 
-       if (isMiddleJavaTextChangeEvent(key, allJSONData)) {
-        addEventDiv(getSafePath(event.entityAddress), "smallEventDiv", event.eventType, key);
-        addPlaceHolders(event.entityAddress, "smallPlaceHolder",key);
-      }else{
-        addEventDiv(getSafePath(event.entityAddress), "eventDiv", event.eventType, key);
-        addPlaceHolders(event.entityAddress, "placeHolder",key); 
-      }
+  			if (isMiddleJavaTextChangeEvent(key, allJSONData)) {
+  				addEventDiv(getSafePath(event.entityAddress), "smallEventDiv", event.eventType, key);
+  				addPlaceHolders(event.entityAddress, "smallPlaceHolder",key);
+  			}else{
+  				addEventDiv(getSafePath(event.entityAddress), "eventDiv", event.eventType, key);
+  				addPlaceHolders(event.entityAddress, "placeHolder",key); 
+  			}
 
-    }else{
-      if(event.eventType === 'testRun'){
-        addEventDiv("events", "eventDiv", event.eventType+"_"+event.testResult, key,event);
-      }else{
-        addEventDiv("events", "eventDiv", event.eventType, key);
-      }
-      addPlaceHolders("events", "placeHolder",key);
-    }
-  }else{
-    addEventDiv("events", "eventDiv", event.eventType, key);
-    addPlaceHolders("events", "placeHolder",key);
+  		}else{
+  			if(event.eventType === 'testRun'){
+  				addEventDiv("events", "eventDiv", event.eventType+"_"+event.testResult, key,event);
+  			}else{
+  				addEventDiv("events", "eventDiv", event.eventType, key);
+  			}
+  			addPlaceHolders("events", "placeHolder",key);
+  		}
+  	}else{
+  		addEventDiv("events", "eventDiv", event.eventType, key);
+  		addPlaceHolders("events", "placeHolder",key);
+  	}
+
+
   }
 
 
-}
 
+  function findAllFiles(allJSONData){
 
+  	fileNames["TDDCycles"] = 1;
 
-function findAllFiles(allJSONData){
+  	$.each( allJSONData, function( key, val ) {
+  		if (!(typeof val.entityAddress === "undefined")){ 
+  			if(val.entityAddress.indexOf(".java") > -1){
+  				fileNames[val.entityAddress] = 1;
+  			}else{
+  				fileNames["events"] = 1;
+  			}
+  		}
 
-  fileNames["TDDCycles"] = 1;
-
-  $.each( allJSONData, function( key, val ) {
-   if (!(typeof val.entityAddress === "undefined")){ 
-    if(val.entityAddress.indexOf(".java") > -1){
-      fileNames[val.entityAddress] = 1;
-    }else{
-      fileNames["events"] = 1;
-    }
+  	});
+  	return(fileNames);
   }
 
-});
-  return(fileNames);
-}
+
+  function loadCyclesFromServer(){
+  	$.getJSON("ajax/Cycles_"+filename, function( data ) {
+  		TDDCycles = data;
+ 	  	console.log(TDDCycles);
+   		addColorandListeners();
+		});
+  	}
+
+  $(document).ready(function(){
+
+  	filename = window.location.href.split("?")[1].split("=")[1];
+
+  	$.getJSON("uploads/"+filename, function( data ) {
+  		allJSONData = data;
+  		var items = [];
+  		var fileNames = findAllFiles(allJSONData);
+  		console.log(fileNames);
+  		$.each(fileNames, function( key, val ) {
+  			$('#allEvents').append("<div class='rowContainer' id='"+key+"Row'><div class='spacer'><div class='rowLabel'>"+key+"</div></div><div class='fileRow' id='" + getSafePath(key) + "' ></div></div>");   
+  		});
+
+  		$.each( allJSONData, function( key, val ) {
+  			addEvent(val,key);
+  		});
+  		addListeners();
+  		loadCyclesFromServer();
+  	});
 
 
-function loadCyclesFromServer(){
-    $.getJSON("ajax/Cycles_"+filename, function( data ) {
-   TDDCycles = data;
-   // var items = [];
-   // var fileNames = findAllFiles(allJSONData);
-   console.log(TDDCycles);
-   addColorandListeners();
-  //  $.each(fileNames, function( key, val ) {
-  //   $('#allEvents').append("<div class='rowContainer' id='"+key+"Row'><div class='spacer'><div class='rowLabel'>"+key+"</div></div><div class='fileRow' id='" + getSafePath(key) + "' ></div></div>");   
-  // });
 
-  //  $.each( allJSONData, function( key, val ) {
-  //   addEvent(val,key);
-  // });
-  //  addListeners();
-
- });
-}
-
-$(document).ready(function(){
-
- filename = window.location.href.split("?")[1].split("=")[1];
-
-  $.getJSON("uploads/"+filename, function( data ) {
-   allJSONData = data;
-   var items = [];
-   var fileNames = findAllFiles(allJSONData);
-   console.log(fileNames);
-   $.each(fileNames, function( key, val ) {
-    $('#allEvents').append("<div class='rowContainer' id='"+key+"Row'><div class='spacer'><div class='rowLabel'>"+key+"</div></div><div class='fileRow' id='" + getSafePath(key) + "' ></div></div>");   
   });
 
-   $.each( allJSONData, function( key, val ) {
-    addEvent(val,key);
-  });
-   addListeners();
-   loadCyclesFromServer();
- });
 
-
-
-});
-
-
-$(function() {
-    $("button")
-      .button()
-      .click(function( event ) {
-        console.log("SAVE CYCLES");
-        console.log(TDDCycles);
-        $.post("ajax/saveAnnotations.php",{ 'TDDCycles': TDDCycles , 'filename':filename});
-      });
+  $(function() {
+  	$("button")
+  	.button()
+  	.click(function( event ) {
+  		console.log("SAVE CYCLES");
+  		console.log(TDDCycles);
+  		$.post("ajax/saveAnnotations.php",{ 'TDDCycles': TDDCycles , 'filename':filename});
+  	});
   });
 
 

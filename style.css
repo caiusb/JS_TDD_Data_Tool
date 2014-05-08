@@ -1,10 +1,12 @@
 * {
 	margin: 0;
 	padding: 0;
+	font-family: "Helvetica";
 }
 html, body {
 	background: #EEE;
 	font: 12px sans-serif;
+	font-family: "Helvetica";
 }
 body {
 	padding-top: 1.8em;
@@ -44,7 +46,7 @@ ins {
 }
 
 #settings {
-	position: absolute;
+	//position: absolute;
 	top: 0;
 	left: 5px;
 	right: 5px;
@@ -90,6 +92,7 @@ ins {
 	width:100%;
 	height:190px;
 	overflow-x: scroll;
+	padding-top: 20px;
 	
 }
 .eventDiv{
@@ -109,19 +112,20 @@ ins {
 }
 
 #textChange{
-	background-color:blue;
+	background-color:#c34500;
 }
 
 .fileRow{
 	background-color:rgb(209, 209, 209);
 	width:100%;
-	height:22px;
+	height:20px;
 	margin-top:0px;
 }
 
 #allEvents{
 	width: 10600px;
 	overflow-x: scroll;
+	margin-top: 7px;
 }
 
 .placeHolder{
@@ -142,10 +146,12 @@ ins {
 
 .rowLabel{
 	position:absolute;
+		font-family: "Helvetica";
+		padding-top: 3px;
 }
 
 .spacer{
-	height:15px;
+	height:18px;
 }
 
 #eventsRow .spacer{
@@ -188,20 +194,20 @@ width: 1px;
 }
 
 .REDCYCLE{
-	background-color: #990000;
+	background-color: #af292e;
 }
 
 .GREENCYCLE{
-	background-color: #119426;
+	background-color: #4e7300;
 }
 .BLUECYCLE{
-	background-color: #111199;
+	background-color: #385e86;
 }
 
 #testRun_Error{
-	background-color: #990000;
+	background-color: #af292e;
 }
 
 #testRun_OK{
-	background-color: #119426;
+	background-color: #4e7300;
 }
