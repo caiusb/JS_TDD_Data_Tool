@@ -221,10 +221,34 @@
 			changed();
 		}
 
+		function createCycle(){
+			// console.log(selectionStart);
+			// console.log(selectionEnd);
+			currStart = selectionStart;
+			currEnd = selectionEnd;
+			TDDCycles.push({"id":currStart+currEnd,"CycleType":"red","CycleStart":currStart,"CycleEnd":currEnd});
+			for (var i=Number(currStart);i<=Number(currEnd);i++)
+			{
+			    //$('#TDD'+i).css( "background-color", "#990000");
+			    $('#TDD'+i).addClass(currStart+currEnd+ " REDCYCLE");
+			    $('#TDD'+i).unbind();
+			    $.contextMenu({
+			    	selector: '#TDD'+i, 
+			    	callback: TDDCallback,
+			    	items: {
+			    		"writingTests": {name: "Tests", icon: "tests"},
+			    		"writingCode": {name: "Code", icon: "code"},
+			    		"refactoring": {name: "Refactor", icon: "refactor"},
+			    		"delete": {name: "Delete", icon: "delete"}
+			    	}
+			    });
+			}
+		}
+
 		function addRightClickHandeler(elem){
 		$.contextMenu({
 			    	selector: elem, 
-			    	callback: TDDCallback,
+			    	callback: createCycle,
 			    	items: {
 			    		"CreateCycle": {name: "CreateCycle", icon: "cycle"}
 			    	}
@@ -236,8 +260,6 @@
 			selectionEnd = last;
 			selectionRow = element.parentElement.id;
 			$( "div" ).removeClass( "firstSelection midSelection lastSelection");
-			console.log("first:"+ first);
-			console.log("last:"+ last);
 			$('#'+selectionRow+" "+"#"+first).addClass("firstSelection");
 			$('#'+selectionRow+" "+"#"+last).addClass("lastSelection");
 			addRightClickHandeler('#'+selectionRow+" "+"#"+first);
@@ -282,9 +304,6 @@
 			}
 		}
 
-		function setupFileDivs(AllFiles){
-			console.log(AllFiles);
-		}
 
 		function getSafePath(path){
 			if(path === undefined){
@@ -321,7 +340,7 @@
 
 
 		function startCycle(el){
-			console.log($(this).attr('id'));
+			//console.log($(this).attr('id'));
 			$(this).css( "background-color", "aqua");
 
 		}
@@ -352,7 +371,7 @@
 				return;
 			}
 		});
-		console.log(CycleID);
+		// console.log(CycleID);
 		if(key === "writingTests"){
 
 			$("."+CycleID).removeClass("GREENCYCLE");
@@ -382,15 +401,15 @@
 	function addListeners(){
 		$('#TDDCycles').mousedown(function(event) {
 			var clickedElement = event.target;
-			console.log(clickedElement.id);
+			// console.log(clickedElement.id);
 			currStart = clickedElement.id.substr(3);
 		});
 
 		$('#TDDCycles').mouseup(function(event) {
 			var clickedElement = event.target;
-			console.log(clickedElement.id);
+			// console.log(clickedElement.id);
 			currEnd = clickedElement.id.substr(3);
-			console.log(currStart + "_" + currEnd);
+			// console.log(currStart + "_" + currEnd);
 
 			TDDCycles.push({"id":currStart+currEnd,"CycleType":"red","CycleStart":currStart,"CycleEnd":currEnd});
 			for (var i=Number(currStart);i<=Number(currEnd);i++)
@@ -441,7 +460,7 @@
 	}
 
 	function removeCycle(selectedID){
-		console.log("REMOVE "+selectedID);
+		//console.log("REMOVE "+selectedID);
 		var newLoop = [];
 		TDDCycles.forEach(function(entry) {
 			//console.log(entry.CycleStart);
@@ -543,7 +562,7 @@
   function loadCyclesFromServer(){
   	$.getJSON("ajax/Cycles_"+filename, function( data ) {
   		TDDCycles = data;
- 	  	console.log(TDDCycles);
+ 	  	// console.log(TDDCycles);
    		addColorandListeners();
 		});
   	}
@@ -556,7 +575,7 @@
   		allJSONData = data;
   		var items = [];
   		var fileNames = findAllFiles(allJSONData);
-  		console.log(fileNames);
+  		// console.log(fileNames);
   		$.each(fileNames, function( key, val ) {
   			$('#allEvents').append("<div class='rowContainer' id='"+key+"Row'><div class='spacer'><div class='rowLabel'>"+key+"</div></div><div class='fileRow' id='" + getSafePath(key) + "' ></div></div>");   
   		});
@@ -577,8 +596,8 @@
   	$("button")
   	.button()
   	.click(function( event ) {
-  		console.log("SAVE CYCLES");
-  		console.log(TDDCycles);
+  		// console.log("SAVE CYCLES");
+  		// console.log(TDDCycles);
   		$.post("ajax/saveAnnotations.php",{ 'TDDCycles': TDDCycles , 'filename':filename});
   	});
   });
