@@ -205,11 +205,11 @@ width: 1px;
 	background-color: #385e86;
 }
 
-#testRun_Error{
+.testRun_Error{
 	background-color: #af292e;
 }
 
-#testRun_OK{
+.testRun_OK{
 	background-color: #4e7300;
 }
 
