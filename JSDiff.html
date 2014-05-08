@@ -3,16 +3,16 @@
 <head>
 	<meta charset="utf-8">
 	<title>COPE TDD Viewer</title>
-	<link rel="stylesheet" href="style.css"/>
-	<script src="jquery-2.1.0.js"></script>
+	<link rel="stylesheet" href="css/style.css"/>
+	<script src="src/jquery-2.1.0.js"></script>
 
 
 	<script src="src/jquery.ui.position.js" type="text/javascript"></script>
 	<script src="src/jquery.contextMenu.js" type="text/javascript"></script>
 
-	<script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+	<script src="src/jquery-ui.js"></script>
 	<link href="src/jquery.contextMenu.css" rel="stylesheet" type="text/css" />
-
+	<link href="css/ui-lightness/jquery-ui-1.10.4.css" rel="stylesheet">
 
 </head>
 <body>
@@ -22,7 +22,8 @@
 		<label><input type="radio" name="diff_type" value="diffChars" checked> Chars</label>
 		<label><input type="radio" name="diff_type" value="diffWords"> Words</label>
 		<label><input type="radio" name="diff_type" value="diffLines"> Lines</label>
-		<button>Save Annotations</button>
+		<button style="margin-left: 20px;">Save Annotations</button>
+		<img id="saveResult" >
 	</div>
 	<div id='tableContainer'>
 	<table>
@@ -614,7 +615,9 @@
   	.click(function( event ) {
   		// console.log("SAVE CYCLES");
   		// console.log(TDDCycles);
-  		$.post("ajax/saveAnnotations.php",{ 'TDDCycles': TDDCycles , 'filename':filename});
+  		$.post("ajax/saveAnnotations.php",{ 'TDDCycles': TDDCycles , 'filename':filename},function callback(){
+  			$('#saveResult').attr("src","icons/accept.png").show().delay(2000).fadeOut(1000);
+  		});
   	});
   });
 
