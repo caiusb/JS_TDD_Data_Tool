@@ -134,7 +134,8 @@ height: 40px;
 	height:20px;
 	float:left;
 	margin-left:0px;
-	background-color:rgb(209, 209, 209);
+	//background-color:rgb(209, 209, 209);
+
 }
 
 .smallPlaceHolder{
@@ -144,6 +145,16 @@ height: 40px;
 	margin-left:0px;
 	background-color:rgb(209, 209, 209);
 }
+
+/*#TDDCyclesRow .placeHolder, .smallPlaceHolder{
+background: 
+linear-gradient(135deg, #ECEDDC 25%, transparent 25%) -50px 0,
+linear-gradient(225deg, #ECEDDC 25%, transparent 25%) -50px 0,
+linear-gradient(315deg, #ECEDDC 25%, transparent 25%),
+linear-gradient(45deg, #ECEDDC 25%, transparent 25%);	
+background-size: 100px 100px;
+background-color: #EC173A;
+}*/
 
 .rowLabel{
 	position:absolute;
@@ -178,20 +189,46 @@ height: 40px;
 }
 
 #TDDCyclesRow .placeHolder{
-	//background-color:orange;
-	border-left: 1px solid;
-	border-top: 1px solid;
-	border-bottom: 1px solid;
+	border-left: 1px solid #DBDBDB;
 	width:7px;
 }
 
 #TDDCyclesRow .smallPlaceHolder{
-//background-color: orange;
-border-left: 1px solid;
-border-top: 1px solid;
-border-bottom: 1px solid;
+border-color:blue;
+border-left: 1px solid  #DBDBDB;
 border-right: 0px;
 width: 1px;
+}
+
+#TDDCycles{
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
+}
+
+#TDDCycles .placeHolder.REDCYCLE{
+	border:none;
+	width:9px;
+}
+#TDDCycles .placeHolder.GREENCYCLE {
+	border:none;
+	width:9px;
+}
+#TDDCycles .placeHolder.BLUECYCLE{
+	border:none;
+	width:9px;
+}
+
+#TDDCycles .smallPlaceHolder.REDCYCLE {
+border:none;
+width:2px;
+}
+#TDDCycles .smallPlaceHolder.GREENCYCLE{
+border:none;
+width:2px;
+}
+#TDDCycles .smallPlaceHolder.BLUECYCLE{
+border:none;
+width:2px;
 }
 
 .REDCYCLE{
@@ -203,6 +240,7 @@ width: 1px;
 }
 .BLUECYCLE{
 	background-color: #385e86;
+	border: none;
 }
 
 .testRun_Error{
