@@ -180,23 +180,26 @@
 		function shiftStartRight(){
 			// console.log("shiftStartRight");
 			var nextTextChange = findNextTextChange(selectionStart);
-			$('#'+selectionRow+" "+"#"+nextTextChange).addClass("firstSelection");
-			$('#'+selectionRow+" "+"#"+selectionStart).removeClass("firstSelection midSelection");
-			selectionStart = nextTextChange;
-			$("#a").empty().text(allJSONData[selectionStart].currText);
-			changed();
-			$.contextMenu('destroy','#'+selectionRow+" "+"#"+selectionStart);
+			if(nextTextChange <= selectionEnd){
+				$('#'+selectionRow+" "+"#"+nextTextChange).addClass("firstSelection");
+				$('#'+selectionRow+" "+"#"+selectionStart).removeClass("firstSelection midSelection");
+				selectionStart = nextTextChange;
+				$("#a").empty().text(allJSONData[selectionStart].currText);
+				changed();
+				$.contextMenu('destroy','#'+selectionRow+" "+"#"+selectionStart);
+			}
 		}
 		function shiftEndLeft(){
 			// console.log("shiftEndLeft");
 			var prevTextChange = findPreviousTextChange(selectionEnd);
-			$('#'+selectionRow+" "+"#"+prevTextChange).addClass("lastSelection");
-			$('#'+selectionRow+" "+"#"+selectionEnd).removeClass("lastSelection midSelection");
-			selectionEnd = prevTextChange;
-			$("#b").empty().text(allJSONData[selectionEnd].currText);
-			changed();
-			$.contextMenu('destroy','#'+selectionRow+" "+"#"+selectionEnd);
-
+			if(prevTextChange >= selectionStart){	
+				$('#'+selectionRow+" "+"#"+prevTextChange).addClass("lastSelection");
+				$('#'+selectionRow+" "+"#"+selectionEnd).removeClass("lastSelection midSelection");
+				selectionEnd = prevTextChange;
+				$("#b").empty().text(allJSONData[selectionEnd].currText);
+				changed();
+				$.contextMenu('destroy','#'+selectionRow+" "+"#"+selectionEnd);
+			}
 		}
 		function shiftEndRight(element){
 			//console.log("shiftEndRight");
@@ -209,7 +212,7 @@
 			addRightClickHandeler('#'+selectionRow+" "+"#"+nextTextChange);
 		}
 
-		function eventClickHandeler(Idx,element){
+		function eventClickHandler(Idx,element){
 			//Handle Text Changes
 			if(allJSONData[Idx].eventType === "textChange"){
 				var first = findFirstTextChange(Idx);
@@ -217,6 +220,8 @@
 				createSelection(first,last,element);
 				$("#a").empty().text(allJSONData[first].currText);
 				$("#b").empty().text(allJSONData[last].currText);
+			}else{
+				$("#a").empty().text(JSON.stringify(allJSONData[Idx]));
 			}
 			changed();
 		}
@@ -521,11 +526,11 @@
   }
 
   function addEventDiv(divId, divClass, eventType, key){
-  	$('#'+divId).append("<div class='" + divClass + " " + eventType + "' id='"+key+"' onClick='eventClickHandeler(" +key+ ",this)'></div>");
+  	$('#'+divId).append("<div class='" + divClass + " " + eventType + "' id='"+key+"' onClick='eventClickHandler(" +key+ ",this)'></div>");
   }
 
   function addEventDiv(divId, divClass, eventType, key, mouseOver){
-  	$('#'+divId).append("<div class='" + divClass + " " + eventType + "' id='"+key+"' onClick='eventClickHandeler(" +key+ ",this)' title="+JSON.stringify(mouseOver)+"></div>");
+  	$('#'+divId).append("<div class='" + divClass + " " + eventType + "' id='"+key+"' onClick='eventClickHandler(" +key+ ",this)' title="+JSON.stringify(mouseOver)+"></div>");
   }
 
   function addEvent(event,key){
