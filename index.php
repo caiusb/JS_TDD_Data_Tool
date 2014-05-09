@@ -32,6 +32,7 @@
 		    closedir($handle);
 		}
 		?>
+		<br><bR>
 		<a href="upload.html">Upload More Json Docs</a>
 
 		</div>
