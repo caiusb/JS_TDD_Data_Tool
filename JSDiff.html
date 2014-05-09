@@ -456,6 +456,7 @@
 
 
 	function addColorandListeners(){
+
 		TDDCycles.forEach(function(entry) {
 			var currCycle;
 			if(entry.CycleType === 'red'){
@@ -466,18 +467,18 @@
 				currCycle = "BLUECYCLE";
 			}
 			for (var i=Number(entry.CycleStart);i<=Number(entry.CycleEnd);i++){
-		        $('#TDD'+i).addClass(currCycle+" "+entry.CycleStart+entry.CycleEnd);
-		        $.contextMenu({
-		        	selector: '#TDD'+i, 
-		        	callback: TDDCallback,
-		        	items: {
-		        		"writingTests": {name: "Tests", icon: "tests"},
-		        		"writingCode": {name: "Code", icon: "code"},
-		        		"refactoring": {name: "Refactor", icon: "refactor"},
-		        		"delete": {name: "Delete", icon: "delete"}
-		        	}
-		        });
-		    }
+				$('#TDD'+i).addClass(currCycle+" "+entry.CycleStart+entry.CycleEnd);
+				$.contextMenu({
+					selector: '#TDD'+i, 
+					callback: TDDCallback,
+					items: {
+						"writingTests": {name: "Tests", icon: "tests"},
+						"writingCode": {name: "Code", icon: "code"},
+						"refactoring": {name: "Refactor", icon: "refactor"},
+						"delete": {name: "Delete", icon: "delete"}
+					}
+				});
+			}
 		});
 	}
 
@@ -582,11 +583,19 @@
 
 
   function loadCyclesFromServer(){
-  	$.getJSON("ajax/Cycles_"+filename, function( data ) {
-  		TDDCycles = data;
- 	  	// console.log(TDDCycles);
-   		addColorandListeners();
-		});
+  	$.ajax({
+  		url: 'ajax/Cycles_'+filename,
+  		dataType: 'json',
+  		success: function( data ) {
+  			if(data === null){
+  				console.log("No TDD Cycles saved");
+  			}else{
+		  		TDDCycles = data;
+		 	  	console.log(TDDCycles);
+		   		addColorandListeners();
+		   	}
+		},
+	});
   	}
 
   $(document).ready(function(){

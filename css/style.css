@@ -243,6 +243,12 @@ width: 1px;
 	width:6px;
 }
 
+.smallEventDiv.firstSelection .eventDiv.lastSelection{
+	width:0px;
+}
+
+
+
 
 #tableContainer{
 	height: 80%;
