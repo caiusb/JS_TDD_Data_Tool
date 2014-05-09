@@ -292,7 +292,7 @@
 				addRightClickHandeler('#'+selectionRow+" "+"#"+i);
 			}
 
-			$('#'+selectionRow).off();
+			$(document).unbind('keydown');
 
 			$(document).keydown(function(e){
 			    if (e.keyCode == 37) { 
