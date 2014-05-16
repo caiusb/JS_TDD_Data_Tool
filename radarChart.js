@@ -83,16 +83,31 @@ var RadarChart = {
 
   var dd = d[0];
 
+  var startX = cfg.w/2 * (1-(parseFloat(Math.max(dd[0].value, 0)/cfg.maxValue)*cfg.factor*Math.sin(0*cfg.radians/total)));
+  var startY = cfg.h/2 * (1-(parseFloat(Math.max(dd[0].value, 0)/cfg.maxValue)*cfg.factor*Math.cos(0*cfg.radians/total)));
+
+  var endX = cfg.w/2 * (1-(parseFloat(Math.max(dd[1].value, 0)/cfg.maxValue)*cfg.factor*Math.sin(1*cfg.radians/total)));
+  var endY = cfg.h/2 * (1-(parseFloat(Math.max(dd[1].value, 0)/cfg.maxValue)*cfg.factor*Math.cos(1*cfg.radians/total)));
+
   g.selectAll(".area")
     .data(dd)
     .enter()
-    .append("line")
-    .attr("x1", cfg.w/2 * (1-(parseFloat(Math.max(dd[0].value, 0)/cfg.maxValue)*cfg.factor*Math.sin(0*cfg.radians/total))))
-    .attr("y1", cfg.h/2 * (1-(parseFloat(Math.max(dd[0].value, 0)/cfg.maxValue)*cfg.factor*Math.cos(0*cfg.radians/total))))
-    .attr("x2", cfg.w/2 * (1-(parseFloat(Math.max(dd[1].value, 0)/cfg.maxValue)*cfg.factor*Math.sin(1*cfg.radians/total))))
-    .attr("y2", cfg.h/2 * (1-(parseFloat(Math.max(dd[1].value, 0)/cfg.maxValue)*cfg.factor*Math.cos(1*cfg.radians/total))))
-    .style("stroke-width", "2px")
-    .style("stroke", cfg.color(series));
+    .append("path")
+    .attr("d", "M" + startX + "," + startY + " Q" + endX + "," + startY + " " + endX + "," + endY )
+    .attr("stroke", cfg.color(series))
+    .attr("stroke-width","3px")
+    .attr("fill", "none");
+
+  // g.selectAll(".area")
+  //   .data(dd)
+  //   .enter()
+  //   .append("line")
+  //   .attr("x1", startX)
+  //   .attr("y1", startY)
+  //   .attr("x2", endX)
+  //   .attr("y2", endY)
+  //   .style("stroke-width", "2px")
+  //   .style("stroke", cfg.color(series));
 
 
 	d.forEach(function(y, x){
